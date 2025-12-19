@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Quiz EDA — Capítulo 1</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background: #0b1220; color:#e8eefc; }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 22px; }
+    .card { background:#111a2e; border:1px solid #243153; border-radius:16px; padding:18px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+    h1 { margin: 0 0 10px; font-size: 22px; }
+    p.mini { margin: 0 0 18px; color:#b7c3e6; }
+    .row { display:flex; gap:10px; flex-wrap: wrap; margin: 14px 0 0; }
+    button {
+      border:1px solid #2b3b66; background:#162343; color:#e8eefc; padding:10px 12px;
+      border-radius: 12px; cursor:pointer; font-weight:600;
+    }
+    button:hover { filter: brightness(1.05); }
+    .q { margin: 14px 0; padding: 14px; border:1px solid #243153; border-radius:14px; background:#0f1730; }
+    .q h3 { margin: 0 0 10px; font-size: 16px; }
+    .opt { display:block; padding:8px 10px; border-radius: 10px; border:1px solid transparent; }
+    .opt:hover { background:#101c3a; border-color:#223156; }
+    .pill { display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; border:1px solid #2b3b66; color:#b7c3e6; }
+    .ok { border-color:#2a7c55 !important; background: rgba(42,124,85,.16) !important; }
+    .bad { border-color:#a83b3b !important; background: rgba(168,59,59,.16) !important; }
+    .exp { margin-top: 10px; color:#b7c3e6; font-size: 13px; line-height: 1.35; }
+    .footer { margin-top: 14px; color:#8ea0d6; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Quiz — EDA (Capítulo 1) • 20 preguntas</h1>
+      <p class="mini">Cada vez que cargues o reinicies, se mezclan las preguntas. Contesta y luego presiona <b>Calificar</b>.</p>
+      <div class="row">
+        <button id="btn-grade">Calificar</button>
+        <button id="btn-reset">Reiniciar (mezclar)</button>
+        <span class="pill" id="status">Listo</span>
+      </div>
+      <div id="quiz"></div>
+      <div class="footer">HTML estático (perfecto para GitHub Pages).</div>
+    </div>
+  </div>
+
+<script>
+const ORIGINAL = [{"q": "¿Cuál es el objetivo principal del Análisis Exploratorio de Datos (EDA)?", "opts": ["Probar hipótesis formales y reportar p-values", "Entender la estructura de los datos, detectar problemas y explorar patrones", "Entrenar el modelo final con el mejor desempeño posible", "Garantizar causalidad entre variables"], "ans": "B", "exp": "EDA se usa para comprender los datos (calidad, distribución, outliers, relaciones) antes de modelar o inferir."}, {"q": "¿Qué describe mejor a los datos 'rectangulares'?", "opts": ["Datos almacenados únicamente en bases NoSQL", "Datos donde filas = registros y columnas = variables", "Datos no estructurados como texto e imágenes", "Datos con más columnas que filas necesariamente"], "ans": "B", "exp": "En datos rectangulares: filas representan casos; columnas, variables."}, {"q": "Un ejemplo de dato NO estructurado es:", "opts": ["Una tabla con ventas (filas y columnas)", "Una matriz numérica de 100x5", "Un texto libre de reseñas de clientes", "Un dataframe con edades y salarios"], "ans": "C", "exp": "Texto libre, audio e imágenes suelen ser no estructurados."}, {"q": "Diferencia clave entre nominal y ordinal:", "opts": ["Nominal siempre es numérica y ordinal siempre es texto", "Ordinal tiene un orden natural, nominal no", "Nominal solo puede tener 2 categorías", "Ordinal no puede graficarse"], "ans": "B", "exp": "Ordinal implica orden (bajo<medio<alto); nominal no (color, marca)."}, {"q": "Si 1,2,3 representan 'Bajo, Medio, Alto', se trata como:", "opts": ["Numérica continua", "Numérica discreta", "Categórica ordinal", "Texto no estructurado"], "ans": "C", "exp": "Aunque sean números, son códigos con orden → ordinal."}, {"q": "Medida de localización más robusta a outliers:", "opts": ["Media", "Mediana", "Media geométrica", "Moda"], "ans": "B", "exp": "La mediana es robusta frente a valores extremos."}, {"q": "La media recortada se obtiene al:", "opts": ["Reemplazar outliers por la media", "Quitar un % de valores más bajos y más altos antes de promediar", "Multiplicar cada valor por un peso aleatorio", "Tomar el valor central"], "ans": "B", "exp": "Reduce influencia de colas eliminando extremos antes de promediar."}, {"q": "Media ponderada:", "opts": ["sum(x)/n", "sum(w)/sum(x)", "sum(w*x)/sum(w)", "sum((x-x̄)^2)"], "ans": "C", "exp": "Σ(w·x)/Σ(w)."}, {"q": "Varianza muestral correcta:", "opts": ["Σx/n", "Σ(x-x̄)/n", "Σ(x-x̄)^2/n", "Σ(x-x̄)^2/(n-1)"], "ans": "D", "exp": "La varianza muestral usa (n-1)."}, {"q": "Relación entre SD y varianza:", "opts": ["SD = var^2", "SD = √(var)", "SD = 1/var", "SD = var/n"], "ans": "B", "exp": "SD es raíz cuadrada de la varianza."}, {"q": "IQR se define como:", "opts": ["Q1+Q3", "Q3-Q1", "max-min", "media-mediana"], "ans": "B", "exp": "IQR = Q3 − Q1."}, {"q": "Regla típica de outliers en boxplot:", "opts": ["Fuera de media ± 1 SD", "Fuera de Q1−1.5·IQR o Q3+1.5·IQR", "Fuera de [0,1]", "Con correlación negativa"], "ans": "B", "exp": "Regla estándar: 1.5·IQR."}, {"q": "La línea dentro de la caja en un boxplot representa:", "opts": ["La media", "La mediana", "El máximo", "El IQR"], "ans": "B", "exp": "Es la mediana."}, {"q": "Gráfica adecuada para ver forma de una distribución numérica:", "opts": ["Histograma", "Tabla de contingencia", "Pastel", "Serie de tiempo"], "ans": "A", "exp": "Histograma/densidad muestran forma (colas, asimetría, modos)."}, {"q": "MAD describe:", "opts": ["Promedio de desviaciones cuadráticas", "Mediana de |x−mediana(x)|, dispersión robusta", "Max-min", "% de faltantes"], "ans": "B", "exp": "MAD es robusta a outliers."}, {"q": "Para resumir una categórica, lo básico es:", "opts": ["Derivadas", "Frecuencias y proporciones", "Varianza", "Autocorrelación"], "ans": "B", "exp": "Se usan conteos, porcentajes y moda."}, {"q": "Relación entre dos categóricas:", "opts": ["Tabla de contingencia", "Histograma", "Boxplot", "Serie de tiempo"], "ans": "A", "exp": "Cross-tab para comparar proporciones."}, {"q": "Pearson r mide principalmente:", "opts": ["Causalidad", "Relación lineal numérico-numérico", "Relación categórica-categórica", "Diferencia de medianas"], "ans": "B", "exp": "Mide asociación lineal (no causalidad)."}, {"q": "Si r = 0:", "opts": ["No hay ninguna relación", "No hay relación lineal (puede haber no lineal)", "Causalidad negativa", "Independencia garantizada"], "ans": "B", "exp": "r=0 descarta linealidad, no otras formas."}, {"q": "Afirmación correcta:", "opts": ["Correlación implica causalidad", "Causalidad implica r=1", "Correlación no implica causalidad", "Si hay correlación una debe ser categórica"], "ans": "C", "exp": "Asociación ≠ causa."}];
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+let QUESTIONS = [];
+const quizEl = document.getElementById('quiz');
+const statusEl = document.getElementById('status');
+
+function render() {
+  quizEl.innerHTML = "";
+  QUESTIONS.forEach((item, idx) => {
+    const qBox = document.createElement('div');
+    qBox.className = 'q';
+    qBox.dataset.correct = item.ans;
+
+    const h = document.createElement('h3');
+    h.textContent = (idx+1) + ". " + item.q;
+    qBox.appendChild(h);
+
+    const letters = ["A","B","C","D"];
+    item.opts.forEach((opt, k) => {
+      const label = document.createElement('label');
+      label.className = 'opt';
+
+      const rb = document.createElement('input');
+      rb.type = 'radio';
+      rb.name = 'q_' + idx;
+      rb.value = letters[k];
+      rb.style.marginRight = "10px";
+
+      label.appendChild(rb);
+      label.appendChild(document.createTextNode(letters[k] + ") " + opt));
+      qBox.appendChild(label);
+    });
+
+    const exp = document.createElement('div');
+    exp.className = 'exp';
+    exp.style.display = 'none';
+    exp.textContent = "Explicación: " + item.exp;
+    qBox.appendChild(exp);
+
+    quizEl.appendChild(qBox);
+  });
+  statusEl.textContent = "Listo";
+}
+
+function resetQuiz() {
+  QUESTIONS = shuffle(ORIGINAL);
+  render();
+}
+
+function grade() {
+  let correct = 0;
+  const qBoxes = Array.from(document.querySelectorAll('.q'));
+
+  qBoxes.forEach((box) => {
+    box.querySelectorAll('.opt').forEach(l => l.classList.remove('ok','bad'));
+    const exp = box.querySelector('.exp');
+    exp.style.display = 'none';
+
+    const correctLetter = box.dataset.correct;
+    const checked = box.querySelector('input[type="radio"]:checked');
+    const chosen = checked ? checked.value : null;
+
+    // marcar la correcta siempre
+    const opts = Array.from(box.querySelectorAll('input[type="radio"]'));
+    opts.forEach(rb => {
+      const label = rb.parentElement;
+      if (rb.value === correctLetter) label.classList.add('ok');
+    });
+
+    if (chosen === correctLetter) {
+      correct += 1;
+    } else {
+      if (chosen) {
+        const badRb = box.querySelector('input[type="radio"][value="' + chosen + '"]');
+        if (badRb) badRb.parentElement.classList.add('bad');
+      }
+      exp.style.display = 'block';
+    }
+  });
+
+  const total = qBoxes.length;
+  const pct = Math.round((correct/total)*100);
+  statusEl.textContent = `Resultado: ${correct}/${total} (${pct}%)`;
+}
+
+document.getElementById('btn-reset').addEventListener('click', resetQuiz);
+document.getElementById('btn-grade').addEventListener('click', grade);
+
+// init
+resetQuiz();
+</script>
+</body>
+</html>
