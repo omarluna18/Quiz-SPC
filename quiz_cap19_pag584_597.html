@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quiz - Capítulo 19 (Números Índices)</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #121a2b;
+      --text: #e9eefc;
+      --muted: #b9c2dd;
+      --accent: #7aa2ff;
+      --danger: #ff6b6b;
+      --ok: #4ade80;
+      --border: rgba(255,255,255,0.10);
+    }
+    body {
+      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 20% 0%, rgba(122,162,255,0.25), transparent 60%),
+                  radial-gradient(900px 500px at 90% 10%, rgba(74,222,128,0.18), transparent 60%),
+                  var(--bg);
+      color: var(--text);
+    }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 24px 16px 48px; }
+    .header { display:flex; gap:16px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; margin-bottom: 18px; }
+    h1 { font-size: 22px; margin: 0; }
+    .subtitle { margin: 6px 0 0; color: var(--muted); line-height: 1.35; }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+    }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom: 14px; }
+    .pill {
+      display:inline-flex; gap:8px; align-items:center;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+      background: rgba(0,0,0,0.18);
+    }
+    .qtext { font-size: 18px; line-height: 1.35; margin: 10px 0 12px; }
+    .options { display:grid; gap:10px; margin: 12px 0 16px; }
+    label.opt {
+      display:flex; gap:10px; align-items:flex-start;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.18);
+      cursor: pointer;
+      transition: transform .06s ease, border-color .15s ease;
+    }
+    label.opt:hover { transform: translateY(-1px); border-color: rgba(122,162,255,0.45); }
+    input[type="radio"] { margin-top: 3px; accent-color: var(--accent); }
+    .btnrow { display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; align-items:center; margin-top: 8px; }
+    button {
+      appearance:none; border:none; cursor:pointer;
+      padding: 10px 14px; border-radius: 12px;
+      background: rgba(122,162,255,0.16);
+      color: var(--text);
+      border: 1px solid rgba(122,162,255,0.35);
+      font-weight: 600;
+    }
+    button:hover { filter: brightness(1.05); }
+    button:disabled { cursor:not-allowed; opacity: 0.55; }
+    .ghost { background: rgba(0,0,0,0.18); border: 1px solid var(--border); color: var(--muted); font-weight: 600; }
+    .msg { margin-top: 10px; color: var(--muted); font-size: 14px; min-height: 18px; }
+    .result { margin-top: 16px; border-top: 1px dashed var(--border); padding-top: 16px; }
+    .score { font-size: 18px; font-weight: 700; margin: 0 0 6px; }
+    .review-item { margin-top: 12px; padding: 12px; border-radius: 14px; border: 1px solid var(--border); background: rgba(0,0,0,0.18); }
+    .tag { display:inline-flex; padding: 4px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; margin-left: 8px; border: 1px solid var(--border); }
+    .ok { color: var(--ok); border-color: rgba(74,222,128,0.35); background: rgba(74,222,128,0.08); }
+    .bad { color: var(--danger); border-color: rgba(255,107,107,0.35); background: rgba(255,107,107,0.08); }
+    .small { font-size: 13px; color: var(--muted); line-height: 1.35; margin-top: 6px; }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <div>
+        <h1>Quiz — Capítulo 19: Números Índices (págs. 584–597)</h1>
+        <p class="subtitle">10 preguntas • opciones mezcladas • calificación y revisión al final • botón de reinicio</p>
+      </div>
+      <div class="pill" id="progressPill">Pregunta 1 / 10</div>
+    </div>
+
+    <div class="card">
+      <div class="topbar">
+        <div class="pill">Base: 100 (periodo base)</div>
+        <div class="pill" id="scorePill">Puntaje: 0</div>
+      </div>
+
+      <div id="quizArea">
+        <div class="qtext" id="qText"></div>
+        <div class="options" id="options"></div>
+
+        <div class="btnrow">
+          <button class="ghost" id="btnRestart" type="button">Reiniciar</button>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="ghost" id="btnPrev" type="button">Anterior</button>
+            <button id="btnNext" type="button">Siguiente</button>
+          </div>
+        </div>
+
+        <div class="msg" id="msg"></div>
+        <div class="result" id="resultArea" style="display:none;"></div>
+      </div>
+    </div>
+
+    <p class="small">
+      Tip: sube este archivo <b>.html</b> a tu hosting o GitHub Pages y enlázalo.
+    </p>
+  </div>
+
+<script>
+const QUESTION_BANK = [{"q": "1) ¿Qué es un número índice (según el tema de Números Índices)?", "options": ["Una medida absoluta que se interpreta sin comparaciones", "Una razón/relación que compara un periodo con una base (a menudo base 100)", "Un promedio simple de precios sin referencia", "Una medida solo para variables cualitativas"], "answer": 1, "explain": "Un índice compara el nivel de una variable (o conjunto) respecto a una base; base 100 facilita interpretar cambios porcentuales."}, {"q": "2) ¿Qué significa 'base 100' en el periodo base?", "options": ["Que los precios del periodo base valen 100 pesos", "Que el índice del periodo base se fija en 100 y los demás son % relativos a esa base", "Que se usan 100 observaciones para construir el índice", "Que el índice solo puede estar entre 0 y 100"], "answer": 1, "explain": "Base 100 significa normalizar el periodo base a 100; por ejemplo 120 = 20% por encima de la base."}, {"q": "3) ¿Cuál es una limitación del índice agregado simple de precios (Σp_n / Σp_0)?", "options": ["Solo funciona si hay ponderadores explícitos", "No permite comparar periodos consecutivos", "Suma precios de bienes distintos sin pesos/unidades comparables, distorsionando", "Siempre es idéntico al de Laspeyres"], "answer": 2, "explain": "El agregado simple puede inducir ponderación implícita y mezclar escalas/unidades, afectando la interpretación."}, {"q": "4) En 'relativos de precios', ¿qué representa p_n / p_0?", "options": ["Cambio relativo del precio del bien entre n y la base 0", "Suma de precios del periodo n", "Diferencia absoluta p_n − p_0", "El ponderador del bien"], "answer": 0, "explain": "Es la razón entre el precio del periodo n y el precio del periodo base."}, {"q": "5) ¿Qué caracteriza al índice de precios de Laspeyres?", "options": ["Usa cantidades actuales (q_n) como ponderadores", "Usa cantidades del periodo base (q_0) como ponderadores", "Usa precios base como ponderadores", "No usa ponderación"], "answer": 1, "explain": "Laspeyres pondera con q_0: P_L = (Σ p_n q_0)/(Σ p_0 q_0) × 100."}, {"q": "6) ¿Qué caracteriza al índice de precios de Paasche?", "options": ["Usa cantidades actuales (q_n) como ponderadores", "Usa cantidades base (q_0) como ponderadores", "Usa precios base como ponderadores", "Siempre es mayor que Laspeyres"], "answer": 0, "explain": "Paasche pondera con q_n: P_P = (Σ p_n q_n)/(Σ p_0 q_n) × 100."}, {"q": "7) ¿Cuál es la fórmula típica del índice de valor?", "options": ["V = (Σ p_n)/(Σ p_0) × 100", "V = (Σ q_n)/(Σ q_0) × 100", "V = (Σ p_n q_n)/(Σ p_0 q_0) × 100", "V = (Σ p_0 q_n)/(Σ p_n q_0) × 100"], "answer": 2, "explain": "El índice de valor compara el valor total (precio×cantidad) en n contra el de la base."}, {"q": "8) ¿Qué idea relaciona precio, cantidad y valor en números índices?", "options": ["P + Q = V", "P × Q ≈ V bajo construcciones consistentes", "P − Q = V", "V siempre es 100"], "answer": 1, "explain": "Se busca coherencia entre índices de precio y cantidad con el índice de valor (relaciones tipo 'reversal' en formulaciones)."}, {"q": "9) ¿Cómo se define el índice 'ideal' de Fisher para precios?", "options": ["Promedio aritmético de Laspeyres y Paasche", "Media geométrica: √(P_L · P_P)", "El mínimo entre Laspeyres y Paasche", "El máximo entre Laspeyres y Paasche"], "answer": 1, "explain": "Fisher usa la media geométrica entre Laspeyres y Paasche como compromiso."}, {"q": "10) En un promedio ponderado de relativos, ¿para qué sirven los pesos?", "options": ["No se usan; todos pesan igual", "Reflejan importancia relativa (por ejemplo gasto/valor) de cada artículo", "Solo cambian la base a 100", "Hacen que el índice siempre sea menor que 100"], "answer": 1, "explain": "Los ponderadores capturan la relevancia de cada bien para que el índice represente mejor el conjunto."}];
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function cloneQuestions() {
+  return QUESTION_BANK.map(q => ({
+    q: q.q,
+    options: [...q.options],
+    answer: q.answer,
+    explain: q.explain
+  }));
+}
+
+let questions = [];
+let idx = 0;
+let userAnswers = [];
+const qText = document.getElementById('qText');
+const optionsDiv = document.getElementById('options');
+const msg = document.getElementById('msg');
+const progressPill = document.getElementById('progressPill');
+const scorePill = document.getElementById('scorePill');
+const btnPrev = document.getElementById('btnPrev');
+const btnNext = document.getElementById('btnNext');
+const btnRestart = document.getElementById('btnRestart');
+const resultArea = document.getElementById('resultArea');
+
+function computeScore() {
+  let score = 0;
+  for (let i = 0; i < questions.length; i++) {
+    if (userAnswers[i] === questions[i].answer) score++;
+  }
+  return score;
+}
+
+function renderProgress() {
+  progressPill.textContent = `Pregunta ${Math.min(idx+1, questions.length)} / ${questions.length}`;
+  scorePill.textContent = `Puntaje: ${computeScore()}`;
+}
+
+function renderQuestion() {
+  msg.textContent = '';
+  msg.style.color = 'var(--muted)';
+  resultArea.style.display = 'none';
+  optionsDiv.innerHTML = '';
+
+  const q = questions[idx];
+  qText.textContent = q.q;
+
+  // Mezclar opciones, pero guardando su índice original
+  const order = shuffle(q.options.map((_, originalIndex) => originalIndex));
+
+  order.forEach((originalIndex, i) => {
+    const optId = `q${idx}_opt${i}`;
+    const label = document.createElement('label');
+    label.className = 'opt';
+    label.setAttribute('for', optId);
+
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = 'opt';
+    radio.id = optId;
+    radio.value = String(originalIndex);
+
+    if (userAnswers[idx] === originalIndex) radio.checked = true;
+
+    radio.addEventListener('change', () => {
+      userAnswers[idx] = originalIndex;
+      scorePill.textContent = `Puntaje: ${computeScore()}`;
+    });
+
+    const span = document.createElement('span');
+    span.textContent = q.options[originalIndex];
+
+    label.appendChild(radio);
+    label.appendChild(span);
+    optionsDiv.appendChild(label);
+  });
+
+  btnPrev.disabled = (idx === 0);
+  btnNext.textContent = (idx === questions.length - 1) ? 'Finalizar' : 'Siguiente';
+  renderProgress();
+}
+
+function showResults() {
+  const score = computeScore();
+  const pct = Math.round((score / questions.length) * 100);
+
+  renderProgress();
+  resultArea.style.display = 'block';
+  resultArea.innerHTML = '';
+
+  const title = document.createElement('div');
+  title.className = 'score';
+  title.textContent = `Resultado: ${score} / ${questions.length} (${pct}%)`;
+  resultArea.appendChild(title);
+
+  const hint = document.createElement('div');
+  hint.className = 'small';
+  hint.textContent = 'Revisión pregunta por pregunta:';
+  resultArea.appendChild(hint);
+
+  questions.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'review-item';
+
+    const user = userAnswers[i];
+    const correct = q.answer;
+
+    const head = document.createElement('div');
+    head.style.fontWeight = '800';
+    head.style.lineHeight = '1.35';
+    head.textContent = q.q.replace(/^\d+\)\s*/, '');
+
+    const tag = document.createElement('span');
+    tag.className = 'tag ' + (user === correct ? 'ok' : 'bad');
+    tag.textContent = (user === correct) ? 'Correcta' : 'Incorrecta';
+    head.appendChild(tag);
+    card.appendChild(head);
+
+    const ua = document.createElement('div');
+    ua.className = 'small';
+    ua.innerHTML = `<b>Tu respuesta:</b> ${user !== undefined ? q.options[user] : 'Sin responder'}`;
+    card.appendChild(ua);
+
+    const ca = document.createElement('div');
+    ca.className = 'small';
+    ca.innerHTML = `<b>Correcta:</b> ${q.options[correct]}`;
+    card.appendChild(ca);
+
+    const ex = document.createElement('div');
+    ex.className = 'small';
+    ex.innerHTML = `<b>Explicación:</b> ${q.explain}`;
+    card.appendChild(ex);
+
+    resultArea.appendChild(card);
+  });
+}
+
+function goNext() {
+  if (idx === questions.length - 1) {
+    const unanswered = userAnswers.findIndex(a => a === undefined);
+    if (unanswered !== -1) {
+      msg.textContent = `Te falta responder la pregunta ${unanswered + 1}.`;
+      msg.style.color = 'var(--danger)';
+      idx = unanswered;
+      renderQuestion();
+      return;
+    }
+    showResults();
+    return;
+  }
+  idx++;
+  renderQuestion();
+}
+
+function goPrev() {
+  if (idx > 0) {
+    idx--;
+    renderQuestion();
+  }
+}
+
+function restartQuiz() {
+  questions = cloneQuestions();
+  shuffle(questions);
+  userAnswers = new Array(questions.length).fill(undefined);
+  idx = 0;
+  msg.textContent = '';
+  renderQuestion();
+}
+
+btnNext.addEventListener('click', goNext);
+btnPrev.addEventListener('click', goPrev);
+btnRestart.addEventListener('click', restartQuiz);
+
+restartQuiz();
+</script>
+</body>
+</html>
