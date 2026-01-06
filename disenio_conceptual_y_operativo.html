@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cuestionario (Págs. 50–65)</title>
+  <style>
+    :root { --bg:#0b1220; --card:#111a2e; --muted:#9fb0d0; --text:#eaf0ff; --ok:#19c37d; --bad:#ff5c5c; --accent:#7aa2ff; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: linear-gradient(180deg, #070c16, var(--bg)); color: var(--text); }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 28px 16px 60px; }
+    header { display:flex; gap:12px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; }
+    h1 { margin: 0 0 6px; font-size: 22px; }
+    .sub { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.4; }
+    .actions { display:flex; gap:10px; align-items:center; }
+    button { border:0; cursor:pointer; padding: 10px 14px; border-radius: 10px; font-weight: 700; }
+    .primary { background: var(--accent); color: #0b1220; }
+    .ghost { background: transparent; color: var(--text); border:1px solid rgba(234,240,255,.18); }
+    .disabled { opacity:.55; cursor:not-allowed; }
+    .scorebar { margin-top: 18px; background: rgba(234,240,255,.08); border:1px solid rgba(234,240,255,.12); border-radius: 14px; padding: 14px; display:none; }
+    .scoreline { display:flex; justify-content:space-between; gap:10px; align-items:center; flex-wrap:wrap; }
+    .pill { padding: 6px 10px; border-radius: 999px; font-weight: 800; background: rgba(122,162,255,.18); border: 1px solid rgba(122,162,255,.25); }
+    .grid { margin-top: 16px; display:grid; grid-template-columns: 1fr; gap: 12px; }
+    .card { background: rgba(17,26,46,.92); border: 1px solid rgba(234,240,255,.12); border-radius: 16px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+    .qhead { display:flex; gap:10px; align-items:flex-start; justify-content:space-between; }
+    .qnum { font-weight: 900; color: var(--muted); }
+    .qtext { font-size: 16px; line-height: 1.35; margin: 0 0 10px; }
+    .opts { display:grid; gap: 8px; margin-top: 10px; }
+    label { display:flex; gap:10px; align-items:flex-start; padding: 10px 12px; border-radius: 12px; background: rgba(234,240,255,.05); border: 1px solid rgba(234,240,255,.10); cursor:pointer; }
+    label:hover { border-color: rgba(122,162,255,.45); }
+    input[type="radio"] { margin-top: 2px; transform: scale(1.1); }
+    .feedback { margin-top: 10px; display:none; }
+    .fb-ok { color: var(--ok); font-weight: 900; }
+    .fb-bad { color: var(--bad); font-weight: 900; }
+    .small { color: var(--muted); font-size: 13px; line-height: 1.35; margin-top: 6px; }
+    .key { margin-top: 8px; font-size: 13px; color: var(--muted); }
+    .key b { color: var(--text); }
+    footer { margin-top: 18px; color: var(--muted); font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Diseño conceptual y diseño operativo</h1>
+        <p class="sub">10 preguntas de opción múltiple. Se mezclan cada vez que cargas la página. Presiona <b>Calificar</b> para ver tu resultado y explicaciones.</p>
+      </div>
+      <div class="actions">
+        <button id="gradeBtn" class="primary">Calificar</button>
+        <button id="resetBtn" class="ghost">Reiniciar</button>
+      </div>
+    </header>
+
+    <div id="scorebar" class="scorebar">
+      <div class="scoreline">
+        <div><b>Resultado:</b> <span id="scoreText"></span></div>
+        <div class="pill" id="scorePill"></div>
+      </div>
+    </div>
+
+    <main id="quiz" class="grid"></main>
+
+    <footer>
+      Tip: Sube este archivo a GitHub Pages y enlázalo desde tu página (Google Sites o similar).
+    </footer>
+  </div>
+
+<script>
+  const RAW_QUESTIONS = [{"id": 1, "prompt": "¿Cuál es el objetivo principal del control y soporte administrativos durante el desarrollo de un proyecto estadístico?", "options": ["Definir únicamente las variables y clasificaciones del proyecto", "Supervisar el avance, comparar contra lo planeado y aplicar acciones correctivas para cumplir objetivos en tiempo y costo", "Sustituir el trabajo del personal operativo en campo", "Limitar la comunicación del proyecto para evitar sesgos"], "answer": 1, "explain": "El control y soporte administrativos se enfocan en medir/supervisar, comparar con lo planeado y corregir para evitar desviaciones de costo y plazo (págs. 50–51)."}, {"id": 2, "prompt": "En la fase de planeación, ¿cuál de los siguientes elementos forma parte de los productos típicos del plan del proyecto?", "options": ["Programa general de actividades (macroactividades) y sus tiempos", "Código fuente final del sistema de captura ya liberado", "Resultados definitivos publicados y difundidos", "Base de datos final validada y cerrada"], "answer": 0, "explain": "El plan del proyecto integra productos como programa general de actividades, organigrama, presupuesto global, convenios y estrategia de control (págs. 50–52)."}, {"id": 3, "prompt": "¿Qué determina principalmente la fase II: Diseño conceptual dentro del proceso de generación estadística?", "options": ["La contratación del personal y la compra de insumos", "Los conceptos y definiciones clave a captar para responder a las necesidades de información alineadas con los objetivos del proyecto", "La publicación de resultados y la estrategia de difusión", "La selección del marco geoestadístico para el operativo de campo"], "answer": 1, "explain": "El diseño conceptual identifica con claridad los conceptos a captar para responder a necesidades de información, dentro de los objetivos del proyecto (págs. 50–53)."}, {"id": 4, "prompt": "¿Cuál de los siguientes conjuntos describe mejor el contenido que integra el documento de diseño conceptual?", "options": ["Marco conceptual, plan general de presentación de resultados, cuestionario/instrumento, criterios de validación y anexos de pruebas/referencias", "Presupuesto global, convenios de financiamiento, organigrama y calendario de pagos", "Manuales de captación, programa de capacitación en campo y logística de traslado", "Especificaciones del servidor, licencias de software y protocolos de respaldo"], "answer": 0, "explain": "El documento de diseño conceptual incluye marco conceptual, plan de resultados, instrumento de captación, criterios de validación y anexos (págs. 51–53)."}, {"id": 5, "prompt": "¿Cuál de las siguientes NO es una macroactividad típica del diseño conceptual?", "options": ["Investigación documental (antecedentes, recomendaciones, legislación, experiencias previas)", "Identificación detallada de necesidades de información y usuarios", "Integración del marco conceptual (variables, conceptos, clasificaciones)", "Elaboración del presupuesto global y convenios de financiamiento"], "answer": 3, "explain": "El presupuesto global y los convenios se ven en la planeación/control administrativo, no como macroactividad del diseño conceptual (págs. 50–55)."}, {"id": 6, "prompt": "¿Para qué se realiza la investigación documental dentro del diseño conceptual?", "options": ["Para elegir el proveedor de telecomunicaciones del proyecto", "Para sustentar decisiones conceptuales revisando antecedentes, recomendaciones, normatividad, experiencias e información existente", "Para asignar dietas y viáticos al personal de campo", "Para reemplazar la validación de datos por revisión bibliográfica"], "answer": 1, "explain": "La investigación documental revisa antecedentes, recomendaciones y normatividad para sustentar decisiones del diseño conceptual (págs. 53–55)."}, {"id": 7, "prompt": "¿Qué es el marco conceptual en un proyecto estadístico?", "options": ["Un listado de actividades administrativas y responsables", "Un esquema ordenado de conceptos, categorías, variables, clasificaciones y definiciones que se adoptarán en el proyecto", "Un conjunto de manuales operativos para la captación", "Un reporte de resultados ya estimados"], "answer": 1, "explain": "El marco conceptual organiza conceptos (temas/categorías), variables, clasificaciones y definiciones aplicadas al proyecto (págs. 54–58)."}, {"id": 8, "prompt": "En el marco conceptual, ¿cómo se diferencia una variable de una clasificación?", "options": ["La variable es siempre cualitativa; la clasificación siempre cuantitativa", "La variable admite valores/modalidades; la clasificación ordena esas modalidades en categorías o intervalos llamados clases", "La variable solo se usa en censos; la clasificación solo en encuestas", "No hay diferencia: son sinónimos"], "answer": 1, "explain": "Una variable admite valores; una clasificación ordena modalidades/intervalos en clases (págs. 54–58)."}, {"id": 9, "prompt": "¿Cuál es el propósito de los criterios de validación definidos en el diseño conceptual?", "options": ["Definir reglas para revisar datos y proponer soluciones que aseguren integridad y congruencia, sin afectar datos válidos originales", "Aumentar la carga de preguntas para obtener más variables", "Eliminar toda observación atípica aunque sea correcta", "Sustituir el procesamiento por revisión manual únicamente"], "answer": 0, "explain": "Los criterios de validación son reglas conceptuales para revisar congruencia/integridad y eliminar inconsistencias sin dañar datos válidos (págs. 56–60)."}, {"id": 10, "prompt": "En la fase IV (diseño de la estrategia de captación y del procesamiento), ¿cuál de los siguientes elementos se contempla explícitamente como parte de la estrategia de captación?", "options": ["Marco geoestadístico y planeación de pruebas/operativos de campo", "Portada final de la publicación impresa y plan de mercadotecnia", "Definición de la teoría del muestreo y sus teoremas", "Elección del idioma oficial para la página web institucional"], "answer": 0, "explain": "La estrategia de captación incluye programa operativo, personal, controles, recursos, pruebas de campo, manuales, comunicación y marco geoestadístico (págs. 61–65)."}];
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function deepCopy(obj) {
+    return JSON.parse(JSON.stringify(obj));
+  }
+
+  // Mezcla opciones y ajusta el índice de respuesta correcta.
+  function shuffleOptions(q) {
+    const indexed = q.options.map((text, idx) => ({ text, idx }));
+    shuffle(indexed);
+    q.options = indexed.map(o => o.text);
+    q.answer = indexed.findIndex(o => o.idx === q.answer);
+    return q;
+  }
+
+  function renderQuiz(questions) {
+    const quizEl = document.getElementById("quiz");
+    quizEl.innerHTML = "";
+
+    questions.forEach((q, qi) => {
+      const card = document.createElement("section");
+      card.className = "card";
+      card.dataset.qid = q.id;
+
+      const head = document.createElement("div");
+      head.className = "qhead";
+
+      const num = document.createElement("div");
+      num.className = "qnum";
+      num.textContent = "Pregunta " + (qi + 1) + " / " + questions.length;
+      head.appendChild(num);
+
+      const p = document.createElement("p");
+      p.className = "qtext";
+      p.textContent = q.prompt;
+
+      card.appendChild(head);
+      card.appendChild(p);
+
+      const opts = document.createElement("div");
+      opts.className = "opts";
+      const name = "q_" + q.id;
+
+      q.options.forEach((optText, oi) => {
+        const lab = document.createElement("label");
+
+        const radio = document.createElement("input");
+        radio.type = "radio";
+        radio.name = name;
+        radio.value = String(oi);
+
+        const span = document.createElement("span");
+        span.textContent = optText;
+
+        lab.appendChild(radio);
+        lab.appendChild(span);
+        opts.appendChild(lab);
+      });
+
+      card.appendChild(opts);
+
+      const fb = document.createElement("div");
+      fb.className = "feedback";
+      fb.id = "fb_" + q.id;
+
+      const fbLine = document.createElement("div");
+      fbLine.id = "fbline_" + q.id;
+
+      const explain = document.createElement("div");
+      explain.className = "small";
+      explain.id = "ex_" + q.id;
+
+      const key = document.createElement("div");
+      key.className = "key";
+      key.id = "key_" + q.id;
+
+      fb.appendChild(fbLine);
+      fb.appendChild(explain);
+      fb.appendChild(key);
+      card.appendChild(fb);
+
+      quizEl.appendChild(card);
+    });
+  }
+
+  function getSelectedIndex(qid) {
+    const radios = document.querySelectorAll('input[name="q_' + qid + '"]');
+    for (const r of radios) {
+      if (r.checked) return parseInt(r.value, 10);
+    }
+    return null;
+  }
+
+  // Escapar HTML para evitar inyección (cuando usamos innerHTML en la línea de claves).
+  function escapeHtml(s) {
+    return String(s)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function grade(questions) {
+    let correct = 0;
+
+    questions.forEach(q => {
+      const picked = getSelectedIndex(q.id);
+      const fb = document.getElementById("fb_" + q.id);
+      const fbline = document.getElementById("fbline_" + q.id);
+      const ex = document.getElementById("ex_" + q.id);
+      const key = document.getElementById("key_" + q.id);
+
+      fb.style.display = "block";
+
+      const rightText = q.options[q.answer];
+      const pickedText = (picked === null) ? null : q.options[picked];
+
+      if (picked === q.answer) {
+        correct += 1;
+        fbline.textContent = "✅ Correcto";
+        fbline.className = "fb-ok";
+      } else {
+        fbline.textContent = "❌ Incorrecto";
+        fbline.className = "fb-bad";
+      }
+
+      ex.textContent = "Explicación: " + q.explain;
+
+      if (picked === null) {
+        key.innerHTML = "<b>Tu respuesta:</b> (sin responder) &nbsp; | &nbsp; <b>Correcta:</b> " + escapeHtml(rightText);
+      } else {
+        key.innerHTML = "<b>Tu respuesta:</b> " + escapeHtml(pickedText) + " &nbsp; | &nbsp; <b>Correcta:</b> " + escapeHtml(rightText);
+      }
+    });
+
+    const scorebar = document.getElementById("scorebar");
+    const scoreText = document.getElementById("scoreText");
+    const scorePill = document.getElementById("scorePill");
+
+    const pct = Math.round((correct / questions.length) * 100);
+
+    scorebar.style.display = "block";
+    scoreText.textContent = correct + " / " + questions.length + " (" + pct + "%)";
+    scorePill.textContent = "Puntaje: " + pct + "%";
+
+    // Deshabilitar botón de calificar para evitar dobles conteos
+    const gradeBtn = document.getElementById("gradeBtn");
+    gradeBtn.classList.add("disabled");
+    gradeBtn.disabled = true;
+  }
+
+  function reset() {
+    window.location.reload(); // re-mezcla
+  }
+
+  // Init
+  let QUESTIONS = deepCopy(RAW_QUESTIONS);
+  shuffle(QUESTIONS);
+  QUESTIONS = QUESTIONS.map(q => shuffleOptions(q));
+  renderQuiz(QUESTIONS);
+
+  document.getElementById("gradeBtn").addEventListener("click", () => grade(QUESTIONS));
+  document.getElementById("resetBtn").addEventListener("click", reset);
+</script>
+</body>
+</html>
