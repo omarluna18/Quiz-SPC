@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cuestionario (Págs. 13–35) - Proceso de generación de estadísticas básicas</title>
+  <style>
+    :root { --maxw: 980px; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background: #0b0f19; color: #e9eefc; }
+    header { padding: 22px 16px; border-bottom: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.02); }
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 16px; }
+    h1 { font-size: 18px; margin: 0 0 6px; }
+    .sub { opacity: .85; font-size: 13px; margin: 0; }
+    main { padding: 18px 0 36px; }
+    .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 14px 0 18px; }
+    button {
+      border: 1px solid rgba(255,255,255,.15);
+      background: rgba(255,255,255,.06);
+      color: #e9eefc;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button:hover { background: rgba(255,255,255,.10); }
+    button.primary { background: rgba(99, 102, 241, .25); border-color: rgba(99, 102, 241, .55); }
+    button.primary:hover { background: rgba(99, 102, 241, .35); }
+    .stat { font-size: 13px; opacity: .9; }
+    .grid { display: grid; gap: 12px; }
+    .card {
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      border-radius: 14px;
+      padding: 14px 14px 12px;
+    }
+    .qtop { display: flex; gap: 10px; align-items: baseline; justify-content: space-between; }
+    .qnum { font-weight: 800; font-size: 13px; opacity: .9; }
+    .qtext { font-size: 15px; line-height: 1.35; margin: 10px 0 10px; }
+    .ref { font-size: 12px; opacity: .75; }
+    .opts { display: grid; gap: 8px; margin: 10px 0 0; }
+    label.opt {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 10px; border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.10);
+      cursor: pointer;
+    }
+    label.opt:hover { background: rgba(255,255,255,.06); }
+    input[type="radio"] { margin-top: 3px; transform: scale(1.05); }
+    .pill {
+      display: inline-block; font-size: 12px; font-weight: 700;
+      padding: 4px 8px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      margin-left: 8px;
+    }
+    .correct { border-color: rgba(34,197,94,.55) !important; background: rgba(34,197,94,.10) !important; }
+    .incorrect { border-color: rgba(239,68,68,.55) !important; background: rgba(239,68,68,.10) !important; }
+    .explain {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px dashed rgba(255,255,255,.18);
+      background: rgba(255,255,255,.03);
+      font-size: 13px; line-height: 1.35;
+      display: none;
+      opacity: .95;
+    }
+    .muted { opacity: .75; }
+    footer { padding: 18px 16px; border-top: 1px solid rgba(255,255,255,.08); opacity: .85; font-size: 12px; }
+    .note { font-size: 12px; opacity: .8; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>Cuestionario (Págs. 13–35): Proceso de generación de estadísticas básicas</h1>
+      <p class="sub">20 preguntas de opción múltiple · Preguntas y opciones se mezclan al cargar o al reiniciar.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="toolbar">
+      <button class="primary" id="btnGrade">Calificar</button>
+      <button id="btnReset">Reiniciar (mezclar)</button>
+      <span class="stat" id="statLine">Listo.</span>
+    </div>
+
+    <div class="grid" id="quiz"></div>
+
+    <p class="note muted">Tip: puedes reiniciar para barajar preguntas y opciones.</p>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      Hecho para estudiar. Fuente: material de capacitación (págs. 13–35).
+    </div>
+  </footer>
+
+<script>
+const ORIGINAL_QUESTIONS = [{"id": 1, "question": "Según el Esquema 1, ¿con qué fase inicia el proceso una vez tomada la decisión de realizar un proyecto estadístico?", "choices": ["Captación", "Planeación", "Procesamiento", "Presentación de resultados"], "answer": 1, "explain": "El esquema indica que, tras decidir realizar el proyecto, se inicia con la fase de planeación para establecer las bases del trabajo.", "ref": "Pág. 13"}, {"id": 2, "question": "En el Esquema 1, ¿cuáles fases forman parte típicamente de la EJECUCIÓN del proyecto?", "choices": ["Planeación, Diseño conceptual y Diseño del operativo", "Captación, Procesamiento y Presentación de resultados", "Evaluación de datos y Evaluación de procesos", "Programación, Organización y Presupuestación global"], "answer": 1, "explain": "El esquema ubica la ejecución principalmente en captación, procesamiento y presentación de resultados.", "ref": "Pág. 13–14"}, {"id": 3, "question": "¿Cuál de los siguientes elementos NO corresponde a las macroactividades de la fase de Planeación?", "choices": ["Definición de objetivos y estrategia general", "Programa general de actividades", "Determinación de la estructura de organización", "Codificación y captura de datos"], "answer": 3, "explain": "La codificación y captura pertenecen al procesamiento; la planeación incluye objetivos/estrategia, programación, organización y presupuesto.", "ref": "Pág. 14–16"}, {"id": 4, "question": "¿Qué describe mejor la Planeación dentro del proceso de generación de estadísticas básicas?", "choices": ["Solo la elaboración del cuestionario definitivo", "La definición formal de objetivos y estrategia, más programa de trabajo, organización y presupuesto global", "La validación de datos y corrección de inconsistencias", "La publicación de tabulados y mapas al público"], "answer": 1, "explain": "La planeación integra objetivos/estrategia, método de generación, programación, organización y presupuesto global.", "ref": "Pág. 14–15"}, {"id": 5, "question": "¿Cuál es un producto explícito de la fase de Planeación?", "choices": ["Glosario", "Convenios con las fuentes de financiamiento", "Factores de expansión", "Cuadros y gráficas finales"], "answer": 1, "explain": "En los productos de la planeación se listan, entre otros, objetivos/estrategia, programa, organigrama, presupuesto y convenios de financiamiento.", "ref": "Pág. 16"}, {"id": 6, "question": "¿Qué enfatiza el documento sobre el control y soporte administrativos del proyecto?", "choices": ["Que solo se requiere al final, durante la publicación", "Que debe proporcionar oportunamente recursos materiales/financieros y vigilar su uso eficiente, además de controlar operaciones", "Que sustituye a las actividades técnicas", "Que se limita a elaborar el glosario"], "answer": 1, "explain": "Se destaca la necesidad de control eficiente y soporte administrativo oportuno para recursos y cumplimiento de metas/tiempos.", "ref": "Pág. 16"}, {"id": 7, "question": "¿Cuál es el propósito central del Diseño conceptual?", "choices": ["Seleccionar entrevistadores y capacitarlos", "Identificar necesidades de información y definir marco conceptual, instrumentos de captación, criterios de validación y esquemas de resultados", "Recuperar materiales institucionales al cierre del operativo", "Calcular exclusivamente los factores de expansión"], "answer": 1, "explain": "El diseño conceptual integra necesidades de información, marco conceptual, instrumentos de captación, validación y diseño de resultados.", "ref": "Pág. 17"}, {"id": 8, "question": "La delimitación temática dentro del diseño conceptual ayuda principalmente a responder:", "choices": ["Quién va a publicar los resultados", "Qué se va a captar y para qué se va a captar", "Cuántas oficinas se abrirán para el operativo", "Qué tipo de estimador es más bonito"], "answer": 1, "explain": "La delimitación temática busca precisar qué se captará y con qué finalidad, considerando costo, utilidad y factibilidad.", "ref": "Pág. 18"}, {"id": 9, "question": "¿Qué es el marco conceptual, según el documento?", "choices": ["Una campaña publicitaria para sensibilizar informantes", "El ordenamiento de temas, categorías, variables y clasificaciones, incluyendo un glosario con definiciones", "La lista final de entrevistadores contratados", "El conjunto de tabulados ya publicados"], "answer": 1, "explain": "El marco conceptual ordena temas/categorías/variables/clasificaciones y se acompaña de un glosario con definiciones precisas.", "ref": "Pág. 18–20"}, {"id": 10, "question": "En el contexto de generación de estadística, una CATEGORÍA es:", "choices": ["Un intervalo numérico dentro de una variable", "El conjunto objeto de cuantificación y caracterización (p. ej., personas, viviendas, establecimientos)", "Un sinónimo de “clase”", "Una regla para corregir omisiones"], "answer": 1, "explain": "Las categorías son conjuntos que se cuantifican y caracterizan para fines de estudio (personas, viviendas, hogares, etc.).", "ref": "Pág. 19"}, {"id": 11, "question": "¿Cuál enunciado describe mejor una VARIABLE en este contexto?", "choices": ["El ordenamiento de modalidades cualitativas", "Un concepto que admite distintos valores y sirve para caracterizar o clasificar elementos (criterio de clasificación)", "Un reporte de incidencias del operativo", "El total general de un cuadro estadístico"], "answer": 1, "explain": "Las variables admiten distintos valores y se usan como referencia para caracterizar/clasificar unidades o conjuntos.", "ref": "Pág. 19"}, {"id": 12, "question": "Una CLASIFICACIÓN se define como:", "choices": ["El conjunto de cuestionarios contestados", "El ordenamiento de las modalidades cualitativas o intervalos numéricos admitidos por una variable", "La estimación del presupuesto global", "Una estrategia de comunicación para el proyecto"], "answer": 1, "explain": "La clasificación ordena modalidades o intervalos; cada modalidad/intervalo se denomina “clase”.", "ref": "Pág. 19"}, {"id": 13, "question": "¿Qué implica la definición de criterios de validación en el diseño conceptual?", "choices": ["Solo revisar ortografía del cuestionario", "Establecer requisitos de integridad y congruencia, y reglas para tratar datos no válidos (omisión, inconsistencia, multirrespuesta)", "Definir la plantilla de entrevistadores", "Imprimir publicaciones finales"], "answer": 1, "explain": "Los criterios de validación fijan requisitos y reglas para resolver omisiones, inconsistencias o multirrespuesta.", "ref": "Pág. 21"}, {"id": 14, "question": "¿Cuál es una buena práctica destacada para el diseño y prueba del instrumento de captación?", "choices": ["Aplicarlo por primera vez directamente a nivel nacional sin pruebas", "Probarlo en condiciones similares a las reales y ajustar con rigor metodológico", "Eliminar manuales e instructivos para simplificar", "Evitar la supervisión para no sesgar"], "answer": 1, "explain": "Se recomienda realizar pruebas en condiciones similares y ajustar con rigor, usando técnicas de control de campo.", "ref": "Pág. 21"}, {"id": 15, "question": "¿Cuál de los siguientes NO aparece como producto del Diseño conceptual?", "choices": ["Glosario", "Criterios de validación", "Esquemas para la presentación de resultados", "Cuestionarios contestados y ordenados para procesamiento"], "answer": 3, "explain": "Los cuestionarios contestados son producto de la captación, no del diseño conceptual.", "ref": "Pág. 22 y 30"}, {"id": 16, "question": "En el Diseño de la muestra, ¿qué busca la elaboración del marco de muestreo?", "choices": ["Crear mapas publicitarios para difusión", "Preparar listas/cartografía/directorios que identifiquen unidades a seleccionar y darles probabilidad conocida y distinta de cero", "Ordenar los tabulados de resultados", "Definir criterios para gráficos bonitos"], "answer": 1, "explain": "El marco de muestreo permite identificar unidades y asignarles probabilidad conocida y distinta de cero de ser incluidas.", "ref": "Pág. 22"}, {"id": 17, "question": "¿Cuál es un elemento que se considera para calcular el tamaño de la muestra?", "choices": ["El color del cuestionario", "Precisión y confianza requeridas, tasa de no respuesta esperada y efecto del diseño", "El número de oficinas administrativas del país", "La cantidad de mapas que habrá en el informe final"], "answer": 1, "explain": "El tamaño de muestra considera objetivos, valor estimado de la característica, precisión/confianza, no respuesta y efecto de diseño.", "ref": "Pág. 23"}, {"id": 18, "question": "¿Qué representa el factor de expansión en encuestas por muestreo?", "choices": ["La cantidad de gráficos en una publicación", "El número de unidades de la población que representa cada unidad de la muestra según su probabilidad de selección", "El presupuesto global dividido entre oficinas", "Un tipo de clasificación cualitativa"], "answer": 1, "explain": "Cada unidad de muestra representa un conjunto de unidades en población; el factor depende de la probabilidad de selección.", "ref": "Pág. 24"}, {"id": 19, "question": "¿Cuál describe mejor la fase de Captación?", "choices": ["Preparar archivos electrónicos depurados y listos para tabular", "Obtener datos de la población o muestra con estructura operativa, controles, materiales de apoyo, RH y programación detallada", "Calcular coeficientes de variación y varianzas de estimadores", "Integrar informes metodológicos para usuarios"], "answer": 1, "explain": "La captación es el operativo para obtener datos, ejecutando procedimientos, materiales, RH, comunicación y controles.", "ref": "Pág. 28–30"}, {"id": 20, "question": "La evaluación del proyecto cubre dos aspectos principales. ¿Cuáles son y para qué sirven?", "choices": ["Publicidad y ventas; para aumentar ingresos", "Proceso y datos; el proceso aporta referencias para futuros proyectos y los datos orientan sobre cobertura/sesgo/inconsistencias", "Diseño gráfico y colorimetría; para mejorar mapas", "Censo y registro; para decidir el nombre del proyecto"], "answer": 1, "explain": "La evaluación considera el proceso (mejoras y referencia futura) y los resultados/datos (cobertura, sesgo, inconsistencias no resueltas).", "ref": "Pág. 35"}];
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function deepClone(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
+let STATE = {
+  questions: [],
+  answers: [],
+  submitted: false
+};
+
+function buildQuiz() {
+  const base = deepClone(ORIGINAL_QUESTIONS);
+
+  // Mezclar preguntas
+  shuffle(base);
+
+  // Mezclar opciones por pregunta y recalcular índice correcto
+  const mixed = base.map(q => {
+    const choices = q.choices.map((text, idx) => ({ text, origIdx: idx }));
+    shuffle(choices);
+    const newAnswer = choices.findIndex(c => c.origIdx === q.answer);
+    return {
+      ...q,
+      choices: choices.map(c => c.text),
+      answer: newAnswer
+    };
+  });
+
+  STATE.questions = mixed;
+  STATE.answers = Array(mixed.length).fill(null);
+  STATE.submitted = false;
+
+  render();
+  updateStats();
+}
+
+function updateStats(extra="") {
+  const answered = STATE.answers.filter(v => v !== null).length;
+  const total = STATE.questions.length;
+  const base = `Respondidas: ${answered}/${total}`;
+  document.getElementById("statLine").textContent = extra ? `${base} · ${extra}` : base;
+}
+
+function render() {
+  const quizEl = document.getElementById("quiz");
+  quizEl.innerHTML = "";
+
+  STATE.questions.forEach((q, qi) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.dataset.qi = String(qi);
+
+    const top = document.createElement("div");
+    top.className = "qtop";
+    top.innerHTML = `
+      <div class="qnum">Pregunta ${qi + 1}</div>
+      <div class="ref">${q.ref || ""}</div>
+    `;
+
+    const qtext = document.createElement("div");
+    qtext.className = "qtext";
+    qtext.textContent = q.question;
+
+    const opts = document.createElement("div");
+    opts.className = "opts";
+
+    q.choices.forEach((optText, oi) => {
+      const id = `q${qi}_o${oi}`;
+      const lab = document.createElement("label");
+      lab.className = "opt";
+      lab.setAttribute("for", id);
+
+      lab.innerHTML = `
+        <input type="radio" id="${id}" name="q${qi}" value="${oi}" />
+        <div>${optText}</div>
+      `;
+
+      lab.querySelector("input").addEventListener("change", (e) => {
+        STATE.answers[qi] = Number(e.target.value);
+        if (STATE.submitted) {
+          // Si ya estaba calificado, no recalificamos automáticamente (para evitar confusión).
+          // Solo actualizamos conteo de respondidas.
+          updateStats("Ya calificaste. Reinicia para volver a intentar.");
+        } else {
+          updateStats();
+        }
+      });
+
+      opts.appendChild(lab);
+    });
+
+    const explain = document.createElement("div");
+    explain.className = "explain";
+    explain.innerHTML = `<b>Explicación:</b> ${q.explain || ""}`;
+
+    card.appendChild(top);
+    card.appendChild(qtext);
+    card.appendChild(opts);
+    card.appendChild(explain);
+
+    quizEl.appendChild(card);
+  });
+}
+
+function grade() {
+  if (STATE.submitted) {
+    updateStats("Ya calificaste. Reinicia para volver a intentar.");
+    return;
+  }
+
+  let score = 0;
+  const total = STATE.questions.length;
+
+  STATE.questions.forEach((q, qi) => {
+    const card = document.querySelector(`.card[data-qi="${qi}"]`);
+    const explain = card.querySelector(".explain");
+    explain.style.display = "block";
+
+    const selected = STATE.answers[qi];
+    const correct = q.answer;
+
+    // Marcar opciones
+    const labels = card.querySelectorAll("label.opt");
+    labels.forEach((lab, oi) => {
+      lab.classList.remove("correct", "incorrect");
+      const pillOld = lab.querySelector(".pill");
+      if (pillOld) pillOld.remove();
+
+      // Señalar correcta siempre
+      if (oi === correct) {
+        lab.classList.add("correct");
+        const pill = document.createElement("span");
+        pill.className = "pill";
+        pill.textContent = "Correcta";
+        lab.appendChild(pill);
+      }
+    });
+
+    if (selected === correct) {
+      score += 1;
+    } else {
+      // Marcar la elegida como incorrecta (si eligió algo)
+      if (selected !== null && labels[selected]) {
+        labels[selected].classList.add("incorrect");
+        const pill = document.createElement("span");
+        pill.className = "pill";
+        pill.textContent = "Tu respuesta";
+        labels[selected].appendChild(pill);
+      }
+    }
+  });
+
+  STATE.submitted = true;
+  updateStats(`Puntaje: ${score}/${total}`);
+}
+
+document.getElementById("btnGrade").addEventListener("click", grade);
+document.getElementById("btnReset").addEventListener("click", buildQuiz);
+
+// Inicial
+buildQuiz();
+</script>
+</body>
+</html>
