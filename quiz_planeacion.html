@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Quiz (Págs. 46–50)</title>
+  <style>
+    :root { --bg:#0b1220; --card:#111a2e; --muted:#9fb0d0; --text:#eaf0ff; --ok:#22c55e; --bad:#ef4444; --line:#223154; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: linear-gradient(120deg, #070b14, var(--bg)); color: var(--text); }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 24px 16px 64px; }
+    header { display:flex; gap:12px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; }
+    h1 { margin: 0; font-size: 1.25rem; letter-spacing: .2px; }
+    .sub { margin-top:6px; color: var(--muted); font-size: .95rem; line-height:1.35; }
+    .panel { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    button {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button:hover { background: rgba(255,255,255,0.10); }
+    button.primary { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.35); }
+    button.primary:hover { background: rgba(34,197,94,0.18); }
+    .score {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .grid { margin-top: 16px; display:grid; gap: 12px; }
+    .card {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.04);
+      border-radius: 16px;
+      padding: 14px 14px 12px;
+    }
+    .qhead { display:flex; gap:10px; align-items:flex-start; justify-content:space-between; }
+    .qnum { color: var(--muted); font-weight: 800; }
+    .qtext { margin: 2px 0 0; font-size: 1.02rem; line-height: 1.35; }
+    .opts { margin-top: 10px; display:grid; gap: 8px; }
+    label.opt {
+      display:flex; gap:10px; align-items:flex-start;
+      padding: 10px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      cursor: pointer;
+    }
+    label.opt:hover { background: rgba(255,255,255,0.06); }
+    input[type="radio"] { margin-top: 3px; }
+    .pill {
+      display:inline-block; padding: 2px 8px; border-radius: 999px;
+      font-size: .78rem; font-weight: 800; letter-spacing:.2px;
+      border: 1px solid rgba(255,255,255,0.14);
+      color: var(--muted);
+    }
+    .pill.ok { color: var(--ok); border-color: rgba(34,197,94,0.35); background: rgba(34,197,94,0.10); }
+    .pill.bad { color: var(--bad); border-color: rgba(239,68,68,0.35); background: rgba(239,68,68,0.10); }
+    .explain { margin-top: 10px; color: var(--muted); line-height: 1.35; display:none; }
+    .show { display:block; }
+    .legend { margin-top: 14px; color: var(--muted); font-size: .9rem; }
+    footer { margin-top: 18px; color: var(--muted); font-size: .85rem; line-height:1.35; }
+    .small { font-size: .85rem; }
+    .req { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Quiz — Planeación </h1>
+        <div class="sub">10 preguntas de opción múltiple. Se barajan al recargar o al presionar <b>Reiniciar</b>. Al calificar, verás tu puntaje y la explicación.</div>
+      </div>
+      <div class="panel">
+        <div id="scoreBox" class="score">Puntaje: <span id="scoreText">—</span></div>
+        <button id="gradeBtn" class="primary">Calificar</button>
+        <button id="resetBtn">Reiniciar</button>
+      </div>
+    </header>
+
+    <div class="legend">
+      <span class="pill">Sin calificar</span>
+      <span class="pill ok">Correcta</span>
+      <span class="pill bad">Incorrecta</span>
+      <span class="req">• Tip: puedes cambiar respuestas antes de calificar.</span>
+    </div>
+
+    <main id="quiz" class="grid" aria-live="polite"></main>
+
+    <footer>
+      <div class="small">Contenido basado en el material “Generación de Información Estadística”, págs. 46–50.</div>
+    </footer>
+  </div>
+
+<script>
+const RAW_QUESTIONS = [{"id": 1, "question": "En el marco del SNIEG, ¿cómo debe justificarse la realización de un proyecto estadístico?", "options": ["Con evidencias documentadas de necesidad y demanda de información; alineado a objetivos institucionales y vinculado a programas del SNIEG.", "Solo con la disponibilidad de presupuesto, sin necesidad de demostrar demanda de información.", "Únicamente por iniciativa personal del responsable del proyecto.", "Con base en que la información sea de interés mediático, aunque no esté ligada a programas del SNIEG."], "answer_index": 0, "explanation": "La Fase I indica que el proyecto debe justificarse con evidencias documentadas de necesidad/demanda, corresponder a objetivos institucionales y vincularse a programas del SNIEG."}, {"id": 2, "question": "Además de la justificación, ¿a qué debe sujetarse la ejecución del proyecto estadístico?", "options": ["A un plan editorial únicamente, sin indicadores de seguimiento.", "A un programa de administración de recursos y al seguimiento sistemático del desarrollo de las fases mediante indicadores para evaluar la calidad de resultados.", "A la publicación inmediata de resultados, aun sin control de calidad.", "A que cada área trabaje sin coordinación para avanzar más rápido."], "answer_index": 1, "explanation": "Se señala que la ejecución debe sujetarse a la administración de recursos y al seguimiento sistemático por fases con indicadores para evaluar calidad."}, {"id": 3, "question": "¿Cuál de los siguientes NO es un elemento al que debe sujetarse la planeación de proyectos estadísticos?", "options": ["Medidas para el resguardo de la información.", "Documentación de decisiones, procedimientos y desarrollo de actividades.", "Cálculo de factores de expansión y estimadores (como producto del diseño muestral).", "Programa general (actividades, tiempos, seguimiento y control del proceso)."], "answer_index": 2, "explanation": "Los factores de expansión/estimadores pertenecen al diseño de la muestra (otra fase). En planeación se listan objetivos, estrategias, TIC, programa general, estructura, presupuesto, resguardo y documentación."}, {"id": 4, "question": "En la fase de Planeación, además de definir objetivos y estrategia general, ¿qué se formula para organizar el proyecto?", "options": ["Un glosario de conceptos y clasificadores, como producto final de la fase.", "Un programa general de trabajo con estimación de tiempos, la estructura organizativa y el presupuesto global para su ejecución.", "El cálculo definitivo del tamaño de muestra y sus precisiones.", "El archivo final de microdatos para difusión."], "answer_index": 1, "explanation": "La planeación incluye el programa general de trabajo (tiempos), estructura de organización y presupuesto global, como base para las demás fases."}, {"id": 5, "question": "¿Cuáles son las macro-actividades de la Fase I (Planeación y control administrativo)?", "options": ["Investigación documental; marco conceptual; cuestionario; criterios de validación; metadatos.", "Definición de objetivos y estrategia general; programa general de actividades; estructura de organización; presupuestación global; control y soporte administrativo.", "Elección del tipo de muestreo; preparación del marco; determinación de la muestra; estimaciones; documentación.", "Captura y codificación; validación; obtención de archivos; tabulados; difusión."], "answer_index": 1, "explanation": "La fase se organiza en cinco macro-actividades: (a) objetivos/estrategia, (b) programa de actividades, (c) estructura, (d) presupuesto, (e) control y soporte."}, {"id": 6, "question": "En la definición de objetivos del proyecto, ¿qué aspecto geográfico se especifica según el documento?", "options": ["Solo el ámbito nacional, sin desgloses.", "Cobertura y desglose geográfico: nacional, estatal, regional, municipal o por localidad.", "Únicamente regiones metropolitanas.", "Exclusivamente por sectores económicos, sin referencia territorial."], "answer_index": 1, "explanation": "La definición de objetivos contempla cobertura y desglose geográfico con niveles como nacional, estatal, regional, municipal o localidad."}, {"id": 7, "question": "¿Qué describe mejor la determinación de la estrategia general del proyecto?", "options": ["Únicamente el diseño de tabulados y el estilo gráfico de publicación.", "La identificación de líneas de acción técnicas y administrativas: método de generación, unidad de observación, bases legales, periodo de levantamiento y tecnologías para captación/procesamiento, entre otros.", "La asignación aleatoria de tareas sin un marco metodológico.", "El cálculo del tamaño de muestra y el ajuste de factores de expansión."], "answer_index": 1, "explanation": "La estrategia general incluye líneas de acción técnicas/administrativas: método, unidad de observación, marco legal, periodo y tecnologías de captación y procesamiento."}, {"id": 8, "question": "El programa general de actividades del proyecto debe incluir, para cada actividad, ¿cuál conjunto de elementos?", "options": ["Solo el nombre del área responsable y el presupuesto.", "Objetivo específico, secuencia, área responsable, tiempo requerido y entregable.", "Únicamente fechas tentativas sin responsables.", "Resultados finales (tablas) y estrategias de difusión en redes sociales."], "answer_index": 1, "explanation": "Debe definirse para cada actividad: objetivo, secuencia, responsable, tiempo y entregable."}, {"id": 9, "question": "¿Cuál de los siguientes es un producto explícito de la planeación (Fase I) según el texto?", "options": ["Organigrama del proyecto.", "Glosario y catálogos clasificadores.", "Factores de expansión y estimadores de precisión.", "Cuestionarios ya llenados y validados."], "answer_index": 0, "explanation": "Entre los productos de la planeación se mencionan: objetivos/estrategia, programa general, organigrama, presupuesto global, convenios y estrategia de control administrativo."}, {"id": 10, "question": "¿Cuál es el propósito central de la Fase II. Diseño conceptual (según la introducción en estas páginas)?", "options": ["Determinar el tamaño de muestra y los estimadores finales.", "Identificar clara y rigurosamente los conceptos que se captarán para responder necesidades de información, dentro de los objetivos del proyecto, interactuando con las demás fases.", "Ejecutar el operativo de levantamiento en campo.", "Publicar los resultados en medios impresos y redes sociales."], "answer_index": 1, "explanation": "El diseño conceptual define los conceptos a captar para cubrir necesidades de información dentro de los objetivos; se relaciona con planeación, muestra, captación/procesamiento y presentación de resultados."}];
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function buildQuizData(raw) {
+  const qCopy = raw.map(q => ({
+    id: q.id,
+    question: q.question,
+    explanation: q.explanation,
+    options: q.options.map((t, idx) => ({ text: t, correct: idx === q.answer_index }))
+  }));
+  shuffle(qCopy);
+  qCopy.forEach(q => shuffle(q.options));
+  return qCopy;
+}
+
+let quizData = [];
+let graded = false;
+
+function render() {
+  const root = document.getElementById("quiz");
+  root.innerHTML = "";
+  quizData.forEach((q, qi) => {
+    const card = document.createElement("section");
+    card.className = "card";
+    card.dataset.qi = String(qi);
+
+    const head = document.createElement("div");
+    head.className = "qhead";
+
+    const left = document.createElement("div");
+    const num = document.createElement("div");
+    num.className = "qnum";
+    num.textContent = `Pregunta ${qi + 1}`;
+    const text = document.createElement("div");
+    text.className = "qtext";
+    text.textContent = q.question;
+
+    left.appendChild(num);
+    left.appendChild(text);
+
+    const status = document.createElement("span");
+    status.className = "pill";
+    status.textContent = "Sin calificar";
+    status.id = `status-${qi}`;
+
+    head.appendChild(left);
+    head.appendChild(status);
+
+    const opts = document.createElement("div");
+    opts.className = "opts";
+
+    const name = `q-${qi}`;
+    q.options.forEach((opt, oi) => {
+      const lab = document.createElement("label");
+      lab.className = "opt";
+
+      const inp = document.createElement("input");
+      inp.type = "radio";
+      inp.name = name;
+      inp.value = String(oi);
+      inp.disabled = graded;
+
+      const span = document.createElement("div");
+      span.textContent = opt.text;
+
+      lab.appendChild(inp);
+      lab.appendChild(span);
+      opts.appendChild(lab);
+    });
+
+    const exp = document.createElement("div");
+    exp.className = "explain";
+    exp.id = `exp-${qi}`;
+    exp.innerHTML = `<b>Explicación:</b> ${escapeHtml(q.explanation)}`;
+
+    card.appendChild(head);
+    card.appendChild(opts);
+    card.appendChild(exp);
+
+    root.appendChild(card);
+  });
+
+  updateScoreBox(null);
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function updateScoreBox(scoreObj) {
+  const scoreText = document.getElementById("scoreText");
+  if (!scoreObj) {
+    scoreText.textContent = "—";
+    return;
+  }
+  scoreText.textContent = `${scoreObj.correctas}/${scoreObj.total} (${scoreObj.pct}%)`;
+}
+
+function grade() {
+  if (graded) return;
+
+  let correct = 0;
+  quizData.forEach((q, qi) => {
+    const chosen = document.querySelector(`input[name="q-${qi}"]:checked`);
+    const status = document.getElementById(`status-${qi}`);
+    const exp = document.getElementById(`exp-${qi}`);
+
+    const correctIndex = q.options.findIndex(o => o.correct);
+
+    if (chosen && Number(chosen.value) === correctIndex) {
+      correct += 1;
+      status.className = "pill ok";
+      status.textContent = "Correcta";
+    } else {
+      status.className = "pill bad";
+      status.textContent = "Incorrecta";
+    }
+    exp.classList.add("show");
+  });
+
+  graded = true;
+  document.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = true);
+
+  const total = quizData.length;
+  const pct = Math.round((correct / total) * 100);
+  updateScoreBox({ correctas: correct, total, pct });
+}
+
+function reset() {
+  graded = false;
+  quizData = buildQuizData(RAW_QUESTIONS);
+  render();
+}
+
+document.getElementById("gradeBtn").addEventListener("click", grade);
+document.getElementById("resetBtn").addEventListener("click", reset);
+
+reset();
+</script>
+</body>
+</html>
