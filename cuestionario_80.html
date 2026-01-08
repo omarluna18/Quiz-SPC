@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Cuestionario (80 preguntas)</title>
+  <style>
+    :root{
+      --bg:#0b1220; --card:#111a2e; --muted:#9fb0d0; --text:#eaf0ff;
+      --ok:#22c55e; --bad:#ef4444; --line:#223154; --accent:#7aa2ff;
+    }
+    body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background: radial-gradient(900px 500px at 10% 0%, rgba(122,162,255,.20), transparent 60%),
+                  radial-gradient(900px 500px at 90% 10%, rgba(34,197,94,.14), transparent 60%),
+                  var(--bg);
+      color:var(--text);
+    }
+    .wrap{ max-width:980px; margin:0 auto; padding:22px 16px 40px; }
+    header{ display:flex; gap:12px; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; }
+    h1{ margin:0; font-size:1.2rem; }
+    .sub{ margin-top:6px; color:var(--muted); font-size:.95rem; line-height:1.35; }
+    .topbar{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .pill{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,0.04);
+      color:var(--muted);
+      border-radius:999px;
+      padding:8px 10px;
+      font-weight:700;
+      font-size:.9rem;
+    }
+    button{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,0.06);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:700;
+    }
+    button:hover{ background: rgba(255,255,255,0.10); }
+    button.primary{ background: rgba(122,162,255,0.18); border-color: rgba(122,162,255,0.45); }
+    button.primary:hover{ background: rgba(122,162,255,0.24); }
+    button:disabled{ opacity:.55; cursor:not-allowed; }
+
+    .card{
+      margin-top:14px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,0.04);
+      border-radius:16px;
+      padding:16px;
+      box-shadow:0 10px 30px rgba(0,0,0,.25);
+    }
+    .qnum{ color:var(--muted); font-weight:900; }
+    .qtext{ margin:6px 0 10px; font-size:1.05rem; line-height:1.35; }
+    .ref{ margin-top:6px; font-size:.85rem; color:var(--muted); }
+    .opts{ margin-top:12px; display:grid; gap:10px; }
+    label.opt{
+      display:flex; gap:10px; align-items:flex-start;
+      padding:12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.12);
+      cursor:pointer;
+    }
+    label.opt:hover{ border-color: rgba(122,162,255,0.45); }
+    input[type="radio"]{ margin-top:3px; accent-color: var(--accent); }
+    .ok{ border-color: rgba(34,197,94,0.55) !important; background: rgba(34,197,94,0.10) !important; }
+    .bad{ border-color: rgba(239,68,68,0.55) !important; background: rgba(239,68,68,0.10) !important; }
+
+    .nav{
+      margin-top:14px;
+      display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; align-items:center;
+    }
+    .msg{ margin-top:10px; color:var(--muted); min-height:18px; }
+    .explain{
+      margin-top:12px;
+      padding:12px;
+      border-radius:12px;
+      border:1px dashed rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.03);
+      color:var(--muted);
+      line-height:1.35;
+      display:none;
+    }
+    .explain.show{ display:block; }
+
+    .scorebox{
+      margin-top:14px;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,0.04);
+      display:none;
+    }
+    .scorebox.show{ display:block; }
+    .scorebig{ font-weight:900; font-size:1.05rem; }
+    .small{ color:var(--muted); font-size:.9rem; margin-top:6px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Cuestionario — 80 preguntas (1 por pantalla)</h1>
+        <div class="sub">Se mezclan preguntas y opciones al cargar y al presionar <b>Mezclar</b>. Puedes avanzar/retroceder y al final <b>Calificar</b>.</div>
+      </div>
+      <div class="topbar">
+        <span class="pill" id="pillProgress">Pregunta —</span>
+        <span class="pill" id="pillAnswered">Respondidas: 0/80</span>
+        <button class="primary" id="btnMix" type="button">Mezclar / Reiniciar</button>
+      </div>
+    </header>
+
+    <div class="scorebox" id="scoreBox">
+      <div class="scorebig" id="scoreText"></div>
+      <div class="small" id="scoreHint"></div>
+    </div>
+
+    <section class="card" id="card">
+      <div class="qnum" id="qnum"></div>
+      <div class="qtext" id="qtext"></div>
+      <div class="ref" id="qref"></div>
+
+      <div class="opts" id="opts"></div>
+
+      <div class="explain" id="explain"></div>
+
+      <div class="nav">
+        <button id="btnPrev" type="button">Anterior</button>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button id="btnNext" type="button">Siguiente</button>
+          <button class="primary" id="btnGrade" type="button">Calificar</button>
+        </div>
+      </div>
+
+      <div class="msg" id="msg"></div>
+    </section>
+  </div>
+
+<script>
+const RAW = [{"id": 1, "q": "En el marco del SNIEG, ¿cómo debe justificarse la realización de un proyecto estadístico?", "options": ["Con evidencias documentadas de necesidad y demanda de información; alineado a objetivos institucionales y vinculado a programas del SNIEG.", "Solo con la disponibilidad de presupuesto, sin necesidad de demostrar demanda de información.", "Únicamente por iniciativa personal del responsable del proyecto.", "Con base en que la información sea de interés mediático, aunque no esté ligada a programas del SNIEG."], "answer": 0, "explain": "La Fase I indica que el proyecto debe justificarse con evidencias documentadas de necesidad/demanda, corresponder a objetivos institucionales y vincularse a programas del SNIEG.", "ref": "Págs. 46–50"}, {"id": 2, "q": "Además de la justificación, ¿a qué debe sujetarse la ejecución del proyecto estadístico?", "options": ["A un plan editorial únicamente, sin indicadores de seguimiento.", "A un programa de administración de recursos y al seguimiento sistemático del desarrollo de las fases mediante indicadores para evaluar la calidad de resultados.", "A la publicación inmediata de resultados, aun sin control de calidad.", "A que cada área trabaje sin coordinación para avanzar más rápido."], "answer": 1, "explain": "La ejecución debe sujetarse a la administración de recursos y al seguimiento sistemático por fases con indicadores para evaluar calidad.", "ref": "Págs. 46–50"}, {"id": 3, "q": "¿Cuál de los siguientes NO es un elemento al que debe sujetarse la planeación de proyectos estadísticos?", "options": ["Medidas para el resguardo de la información.", "Documentación de decisiones, procedimientos y desarrollo de actividades.", "Cálculo de factores de expansión y estimadores (como producto del diseño muestral).", "Programa general (actividades, tiempos, seguimiento y control del proceso)."], "answer": 2, "explain": "Los factores de expansión/estimadores pertenecen al diseño de la muestra. En planeación se listan objetivos, estrategias, TIC, programa general, estructura, presupuesto, resguardo y documentación.", "ref": "Págs. 46–50"}, {"id": 4, "q": "En la fase de Planeación, además de definir objetivos y estrategia general, ¿qué se formula para organizar el proyecto?", "options": ["Un glosario de conceptos y clasificadores, como producto final de la fase.", "Un programa general de trabajo con estimación de tiempos, la estructura organizativa y el presupuesto global para su ejecución.", "El cálculo definitivo del tamaño de muestra y sus precisiones.", "El archivo final de microdatos para difusión."], "answer": 1, "explain": "La planeación incluye el programa general de trabajo (tiempos), estructura de organización y presupuesto global, como base para las demás fases.", "ref": "Págs. 46–50"}, {"id": 5, "q": "¿Cuáles son las macro-actividades de la Fase I (Planeación y control administrativo)?", "options": ["Investigación documental; marco conceptual; cuestionario; criterios de validación; metadatos.", "Definición de objetivos y estrategia general; programa general de actividades; estructura de organización; presupuestación global; control y soporte administrativo.", "Elección del tipo de muestreo; preparación del marco; determinación de la muestra; estimaciones; documentación.", "Captura y codificación; validación; obtención de archivos; tabulados; difusión."], "answer": 1, "explain": "La fase se organiza en cinco macro-actividades: (a) objetivos/estrategia, (b) programa de actividades, (c) estructura, (d) presupuesto, (e) control y soporte.", "ref": "Págs. 46–50"}, {"id": 6, "q": "En la definición de objetivos del proyecto, ¿qué aspecto geográfico se especifica según el documento?", "options": ["Solo el ámbito nacional, sin desgloses.", "Cobertura y desglose geográfico: nacional, estatal, regional, municipal o por localidad.", "Únicamente regiones metropolitanas.", "Exclusivamente por sectores económicos, sin referencia territorial."], "answer": 1, "explain": "Los objetivos contemplan cobertura y desglose geográfico con niveles como nacional, estatal, regional, municipal o localidad.", "ref": "Págs. 46–50"}, {"id": 7, "q": "¿Qué describe mejor la determinación de la estrategia general del proyecto?", "options": ["Únicamente el diseño de tabulados y el estilo gráfico de publicación.", "La identificación de líneas de acción técnicas y administrativas: método de generación, unidad de observación, bases legales, periodo de levantamiento y tecnologías para captación/procesamiento, entre otros.", "La asignación aleatoria de tareas sin un marco metodológico.", "El cálculo del tamaño de muestra y el ajuste de factores de expansión."], "answer": 1, "explain": "La estrategia general incluye líneas de acción técnicas/administrativas: método, unidad de observación, marco legal, periodo y tecnologías de captación y procesamiento.", "ref": "Págs. 46–50"}, {"id": 8, "q": "El programa general de actividades del proyecto debe incluir, para cada actividad, ¿cuál conjunto de elementos?", "options": ["Solo el nombre del área responsable y el presupuesto.", "Objetivo específico, secuencia, área responsable, tiempo requerido y entregable.", "Únicamente fechas tentativas sin responsables.", "Resultados finales (tablas) y estrategias de difusión en redes sociales."], "answer": 1, "explain": "Debe definirse para cada actividad: objetivo, secuencia, responsable, tiempo y entregable.", "ref": "Págs. 46–50"}, {"id": 9, "q": "¿Cuál de los siguientes es un producto explícito de la planeación (Fase I) según el texto?", "options": ["Organigrama del proyecto.", "Glosario y catálogos clasificadores.", "Factores de expansión y estimadores de precisión.", "Cuestionarios ya llenados y validados."], "answer": 0, "explain": "Productos de la planeación: objetivos/estrategia, programa general, organigrama, presupuesto global, convenios y estrategia de control administrativo.", "ref": "Págs. 46–50"}, {"id": 10, "q": "¿Cuál es el propósito central de la Fase II. Diseño conceptual (según la introducción en estas páginas)?", "options": ["Determinar el tamaño de muestra y los estimadores finales.", "Identificar clara y rigurosamente los conceptos que se captarán para responder necesidades de información, dentro de los objetivos del proyecto, interactuando con las demás fases.", "Ejecutar el operativo de levantamiento en campo.", "Publicar los resultados en medios impresos y redes sociales."], "answer": 1, "explain": "El diseño conceptual define los conceptos a captar para cubrir necesidades de información dentro de los objetivos; se relaciona con planeación, muestra, captación/procesamiento y presentación de resultados.", "ref": "Págs. 46–50"}, {"id": 11, "q": "¿Qué es un número índice (según el tema de Números Índices)?", "options": ["Una medida absoluta que se interpreta sin comparaciones", "Una razón/relación que compara un periodo con una base (a menudo base 100)", "Un promedio simple de precios sin referencia", "Una medida solo para variables cualitativas"], "answer": 1, "explain": "Un índice compara el nivel de una variable (o conjunto) respecto a una base; base 100 facilita interpretar cambios porcentuales.", "ref": "Cap. 19 (págs. 584–597)"}, {"id": 12, "q": "¿Qué significa 'base 100' en el periodo base?", "options": ["Que los precios del periodo base valen 100 pesos", "Que el índice del periodo base se fija en 100 y los demás son % relativos a esa base", "Que se usan 100 observaciones para construir el índice", "Que el índice solo puede estar entre 0 y 100"], "answer": 1, "explain": "Base 100 significa normalizar el periodo base a 100; por ejemplo 120 = 20% por encima de la base.", "ref": "Cap. 19 (págs. 584–597)"}, {"id": 13, "q": "¿Cuál es una limitación del índice agregado simple de precios (Σp_n / Σp_0)?", "options": ["Solo funciona si hay ponderadores explícitos", "No permite comparar periodos consecutivos", "Suma precios de bienes distintos sin pesos/unidades comparables, distorsionando", "Siempre es idéntico al de Laspeyres"], "answer": 2, "explain": "El agregado simple puede inducir ponderación implícita y mezclar escalas/unidades, afectando la interpretación.", "ref": "Cap. 19 (págs. 584–597)"}, {"id": 14, "q": "En 'relativos de precios', ¿qué representa p_n / p_0?", "options": ["Cambio relativo del precio del bien entre n y la base 0", "Suma de precios del periodo n", "Diferencia absoluta p_n − p_0", "El ponderador del bien"], "answer": 0, "explain": "Es la razón entre el precio del periodo n y el precio del periodo base.", "ref": "Cap. 19 (págs. 584–597)"}, {"id": 15, "q": "¿Qué caracteriza al índice de precios de Laspeyres?", "options": ["Usa cantidades actuales (q_n) como ponderadores", "Usa cantidades del periodo base (q_0) como ponderadores", "Usa precios base como ponderadores", "No usa ponderación"], "answer": 1, "explain": "Laspeyres pondera con q_0: P_L = (Σ p_n q_0)/(Σ p_0 q_0) × 100.", "ref": "Cap. 19 (págs. 584–597)"}, {"id": 16, "q": "¿Qué caracteriza al índice de precios de Paasche?", "options": ["Usa cantidades actuales (q_n) como ponderadores", "Usa cantidades base (q_0) como ponderadores", "Usa precios base como ponderadores", "Siempre es mayor que Laspeyres"], "answer": 0, "explain": "Paasche pondera con q_n: P_P = (Σ p_n q_n)/(Σ p_0 q_n) × 100.", "ref": "Cap. 19 (págs. 584–597)"}, {"id": 17, "q": "¿Cuál es la fórmula típica del índice de valor?", "options": ["V = (Σ p_n)/(Σ p_0) × 100", "V = (Σ q_n)/(Σ q_0) × 100", "V = (Σ p_n q_n)/(Σ p_0 q_0) × 100", "V = (Σ p_0 q_n)/(Σ p_n q_0) × 100"], "answer": 2, "explain": "El índice de valor compara el valor total (precio×cantidad) en n contra el de la base.", "ref": "Cap. 19 (págs. 584–597)"}, {"id": 18, "q": "¿Qué idea relaciona precio, cantidad y valor en números índices?", "options": ["P + Q = V", "P × Q ≈ V bajo construcciones consistentes", "P − Q = V", "V siempre es 100"], "answer": 1, "explain": "Se busca coherencia entre índices de precio y cantidad con el índice de valor (relaciones tipo 'reversal' en formulaciones).", "ref": "Cap. 19 (págs. 584–597)"}, {"id": 19, "q": "¿Cómo se define el índice 'ideal' de Fisher para precios?", "options": ["Promedio aritmético de Laspeyres y Paasche", "Media geométrica: √(P_L · P_P)", "El mínimo entre Laspeyres y Paasche", "El máximo entre Laspeyres y Paasche"], "answer": 1, "explain": "Fisher usa la media geométrica entre Laspeyres y Paasche como compromiso.", "ref": "Cap. 19 (págs. 584–597)"}, {"id": 20, "q": "En un promedio ponderado de relativos, ¿para qué sirven los pesos?", "options": ["No se usan; todos pesan igual", "Reflejan importancia relativa (por ejemplo gasto/valor) de cada artículo", "Solo cambian la base a 100", "Hacen que el índice siempre sea menor que 100"], "answer": 1, "explain": "Los ponderadores capturan la relevancia de cada bien para que el índice represente mejor el conjunto.", "ref": "Cap. 19 (págs. 584–597)"}, {"id": 21, "q": "¿Cuáles son las cuatro funciones sustantivas de un servicio estadístico?", "options": ["Generación de estadísticas básicas, generación de estadísticas derivadas, integración de estadísticas, divulgación", "Planeación, presupuestación, auditoría, evaluación", "Recaudación, inspección, sanción, fiscalización", "Diseño gráfico, impresión, distribución, ventas"], "answer": 0, "explain": "Las 4 funciones: estadísticas básicas, derivadas, integración y divulgación.", "ref": "Servicio estadístico"}, {"id": 22, "q": "¿Qué describe mejor la generación de estadísticas básicas?", "options": ["Crear indicadores usando metodologías ajenas a la fuente original", "Aplicar cuestionarios o formatos a toda la población o a una muestra para cuantificar y caracterizar", "Ordenar datos de distintas fuentes para facilitar consulta", "Promocionar resultados en medios masivos"], "answer": 1, "explain": "Las básicas se obtienen directamente (censos, encuestas, registros) sin conceptualizaciones ajenas al proyecto.", "ref": "Servicio estadístico"}, {"id": 23, "q": "¿Qué incluye la generación de estadísticas básicas según el texto?", "options": ["Censos, encuestas por muestreo y registros administrativos", "Únicamente censos", "Solo encuestas en línea", "Solo contabilidad nacional"], "answer": 0, "explain": "Se incluyen censos, encuestas por muestreo y registros administrativos.", "ref": "Servicio estadístico"}, {"id": 24, "q": "¿Qué es un censo (en este contexto)?", "options": ["Un estudio de opinión con muestra pequeña", "Un registro continuo de trámites administrativos", "Obtención de datos individuales de todos los elementos del conjunto de estudio en un momento/periodo específico", "Una combinación de varias fuentes con metodologías externas"], "answer": 2, "explain": "El censo cubre a todos los elementos del conjunto de estudio en un momento/periodo definido.", "ref": "Servicio estadístico"}, {"id": 25, "q": "¿Cuáles son características clave de un censo mencionadas en el texto?", "options": ["Aleatoriedad, confidencialidad, panel", "Universalidad, exhaustividad, simultaneidad", "Rentabilidad, rapidez, anonimato", "Publicidad, repetición, representatividad"], "answer": 1, "explain": "El texto resalta universalidad, exhaustividad y simultaneidad.", "ref": "Servicio estadístico"}, {"id": 26, "q": "¿Qué describe mejor una encuesta por muestreo?", "options": ["Selecciona una muestra representativa con procedimientos técnicos para inferir resultados a la población con cierta precisión", "Mide a todos los elementos sin excepción", "Solo usa registros administrativos sin ajuste alguno", "Solo ordena series históricas ya publicadas"], "answer": 0, "explain": "La encuesta por muestreo usa una muestra representativa para inferir resultados a la población.", "ref": "Servicio estadístico"}, {"id": 27, "q": "Según el texto, una limitación común de las encuestas (vs censos o registros) es que…", "options": ["No permiten estimaciones", "Tienen menor posibilidad de desglose geográfico", "Siempre cuestan más que un censo", "No requieren marco ni diseño muestral"], "answer": 1, "explain": "Se menciona menor posibilidad de desglose geográfico que censos o registros.", "ref": "Servicio estadístico"}, {"id": 28, "q": "¿Qué caracteriza el aprovechamiento de registros administrativos para fines estadísticos?", "options": ["Se generan solo con entrevistas cara a cara", "Son registros continuos de hechos/sucesos; suelen tener costo marginal y cobertura limitada al ámbito legal del registro", "Siempre tienen cobertura temática ilimitada", "No requieren ajustes ni integración de bases"], "answer": 1, "explain": "Registros continuos, costo marginal y límites por el ámbito legal/administrativo; suelen requerir ajustes para uso estadístico.", "ref": "Servicio estadístico"}, {"id": 29, "q": "¿Qué son las estadísticas derivadas?", "options": ["Las que se obtienen aplicando cuestionarios a toda la población", "Las que se producen usando estadísticas de una o varias fuentes, aplicando conceptualizaciones o metodologías ajenas a las fuentes originales", "Las que solo se publican en medios masivos", "Las que provienen únicamente de registros administrativos sin procesamiento"], "answer": 1, "explain": "Derivadas = usar una o varias fuentes y aplicar conceptualizaciones/metodologías ajenas a las fuentes originales.", "ref": "Servicio estadístico"}, {"id": 30, "q": "¿Qué describe mejor la divulgación en un servicio estadístico?", "options": ["Actividades para hacer llegar la información a los usuarios (p. ej., comercialización, centros de consulta, atención de requerimientos, medios, redes)", "Seleccionar la muestra y levantar la encuesta", "Calcular indicadores complejos como contabilidad nacional", "Ordenar bases de datos internas sin publicarlas"], "answer": 0, "explain": "Divulgación = hacer llegar la información al usuario por distintos medios/mecanismos.", "ref": "Servicio estadístico"}, {"id": 31, "q": "¿Cuál es el objetivo principal del control y soporte administrativos durante el desarrollo de un proyecto estadístico?", "options": ["Definir únicamente las variables y clasificaciones del proyecto", "Supervisar el avance, comparar contra lo planeado y aplicar acciones correctivas para cumplir objetivos en tiempo y costo", "Sustituir el trabajo del personal operativo en campo", "Limitar la comunicación del proyecto para evitar sesgos"], "answer": 1, "explain": "Control y soporte administrativos: medir/supervisar, comparar con lo planeado y corregir para evitar desviaciones de costo y plazo.", "ref": "Págs. 50–65"}, {"id": 32, "q": "En la fase de planeación, ¿cuál de los siguientes elementos forma parte de los productos típicos del plan del proyecto?", "options": ["Programa general de actividades (macroactividades) y sus tiempos", "Código fuente final del sistema de captura ya liberado", "Resultados definitivos publicados y difundidos", "Base de datos final validada y cerrada"], "answer": 0, "explain": "El plan integra productos como programa general de actividades, organigrama, presupuesto global, convenios y estrategia de control.", "ref": "Págs. 50–65"}, {"id": 33, "q": "¿Qué determina principalmente la fase II: Diseño conceptual dentro del proceso de generación estadística?", "options": ["La contratación del personal y la compra de insumos", "Los conceptos y definiciones clave a captar para responder a las necesidades de información alineadas con los objetivos del proyecto", "La publicación de resultados y la estrategia de difusión", "La selección del marco geoestadístico para el operativo de campo"], "answer": 1, "explain": "El diseño conceptual identifica con claridad los conceptos a captar para responder a necesidades de información dentro de los objetivos del proyecto.", "ref": "Págs. 50–65"}, {"id": 34, "q": "¿Cuál de los siguientes conjuntos describe mejor el contenido que integra el documento de diseño conceptual?", "options": ["Marco conceptual, plan general de presentación de resultados, cuestionario/instrumento, criterios de validación y anexos de pruebas/referencias", "Presupuesto global, convenios de financiamiento, organigrama y calendario de pagos", "Manuales de captación, programa de capacitación en campo y logística de traslado", "Especificaciones del servidor, licencias de software y protocolos de respaldo"], "answer": 0, "explain": "Incluye marco conceptual, plan de resultados, instrumento de captación, criterios de validación y anexos.", "ref": "Págs. 50–65"}, {"id": 35, "q": "¿Cuál de las siguientes NO es una macroactividad típica del diseño conceptual?", "options": ["Investigación documental (antecedentes, recomendaciones, legislación, experiencias previas)", "Identificación detallada de necesidades de información y usuarios", "Integración del marco conceptual (variables, conceptos, clasificaciones)", "Elaboración del presupuesto global y convenios de financiamiento"], "answer": 3, "explain": "El presupuesto global y convenios se ven en planeación/control administrativo, no como macroactividad del diseño conceptual.", "ref": "Págs. 50–65"}, {"id": 36, "q": "¿Para qué se realiza la investigación documental dentro del diseño conceptual?", "options": ["Para elegir el proveedor de telecomunicaciones del proyecto", "Para sustentar decisiones conceptuales revisando antecedentes, recomendaciones, normatividad, experiencias e información existente", "Para asignar dietas y viáticos al personal de campo", "Para reemplazar la validación de datos por revisión bibliográfica"], "answer": 1, "explain": "Se revisan antecedentes, recomendaciones y normatividad para sustentar decisiones del diseño conceptual.", "ref": "Págs. 50–65"}, {"id": 37, "q": "¿Qué es el marco conceptual en un proyecto estadístico?", "options": ["Un listado de actividades administrativas y responsables", "Un esquema ordenado de conceptos, categorías, variables, clasificaciones y definiciones que se adoptarán en el proyecto", "Un conjunto de manuales operativos para la captación", "Un reporte de resultados ya estimados"], "answer": 1, "explain": "Organiza conceptos (temas/categorías), variables, clasificaciones y definiciones aplicadas al proyecto.", "ref": "Págs. 50–65"}, {"id": 38, "q": "En el marco conceptual, ¿cómo se diferencia una variable de una clasificación?", "options": ["La variable es siempre cualitativa; la clasificación siempre cuantitativa", "La variable admite valores/modalidades; la clasificación ordena esas modalidades en categorías o intervalos llamados clases", "La variable solo se usa en censos; la clasificación solo en encuestas", "No hay diferencia: son sinónimos"], "answer": 1, "explain": "Variable: valores/modalidades; clasificación: ordena modalidades/intervalos en clases.", "ref": "Págs. 50–65"}, {"id": 39, "q": "¿Cuál es el propósito de los criterios de validación definidos en el diseño conceptual?", "options": ["Definir reglas para revisar datos y proponer soluciones que aseguren integridad y congruencia, sin afectar datos válidos originales", "Aumentar la carga de preguntas para obtener más variables", "Eliminar toda observación atípica aunque sea correcta", "Sustituir el procesamiento por revisión manual únicamente"], "answer": 0, "explain": "Reglas conceptuales para revisar congruencia/integridad y corregir inconsistencias sin dañar datos válidos.", "ref": "Págs. 50–65"}, {"id": 40, "q": "En la fase IV (diseño de la estrategia de captación y del procesamiento), ¿cuál de los siguientes elementos se contempla explícitamente como parte de la estrategia de captación?", "options": ["Marco geoestadístico y planeación de pruebas/operativos de campo", "Portada final de la publicación impresa y plan de mercadotecnia", "Definición de la teoría del muestreo y sus teoremas", "Elección del idioma oficial para la página web institucional"], "answer": 0, "explain": "Incluye programa operativo, personal, controles, recursos, pruebas de campo, manuales, comunicación y marco geoestadístico.", "ref": "Págs. 50–65"}, {"id": 41, "q": "¿Cuál es el objetivo principal del Análisis Exploratorio de Datos (EDA)?", "options": ["Probar hipótesis formales y reportar p-values", "Entender la estructura de los datos, detectar problemas y explorar patrones", "Entrenar el modelo final con el mejor desempeño posible", "Garantizar causalidad entre variables"], "answer": 1, "explain": "EDA se usa para comprender los datos (calidad, distribución, outliers, relaciones) antes de modelar o inferir.", "ref": "EDA Cap. 1"}, {"id": 42, "q": "¿Qué describe mejor a los datos 'rectangulares' (rectangular data)?", "options": ["Datos almacenados únicamente en bases NoSQL", "Datos donde filas = registros y columnas = variables", "Datos no estructurados como texto e imágenes", "Datos con más columnas que filas necesariamente"], "answer": 1, "explain": "En datos rectangulares: filas representan casos/registros; columnas, variables/atributos.", "ref": "EDA Cap. 1"}, {"id": 43, "q": "Un ejemplo de dato NO estructurado es:", "options": ["Una tabla con ventas (filas y columnas)", "Una matriz numérica de 100x5", "Un texto libre de reseñas de clientes", "Un dataframe con edades y salarios"], "answer": 2, "explain": "Texto libre, audio e imágenes suelen considerarse no estructurados.", "ref": "EDA Cap. 1"}, {"id": 44, "q": "¿Cuál es la diferencia clave entre una variable nominal y una ordinal?", "options": ["La nominal siempre es numérica y la ordinal siempre es texto", "La ordinal tiene un orden natural, la nominal no", "La nominal puede tener solo 2 categorías, la ordinal no", "La ordinal no puede usarse en gráficos"], "answer": 1, "explain": "Ordinal implica orden (bajo<medio<alto); nominal son categorías sin orden (color, marca).", "ref": "EDA Cap. 1"}, {"id": 45, "q": "Si una columna tiene valores 1, 2, 3 que representan 'Bajo, Medio, Alto', lo correcto es tratarla como:", "options": ["Numérica continua", "Numérica discreta", "Categórica ordinal", "Texto no estructurado"], "answer": 2, "explain": "Aunque sean números, son códigos con orden → categórica ordinal.", "ref": "EDA Cap. 1"}, {"id": 46, "q": "¿Qué medida de localización es más robusta a outliers?", "options": ["Media", "Mediana", "Media geométrica", "Moda"], "answer": 1, "explain": "La mediana no se ve tan afectada por valores extremos como la media.", "ref": "EDA Cap. 1"}, {"id": 47, "q": "La 'media recortada' (trimmed mean) se obtiene al:", "options": ["Reemplazar outliers por la media", "Quitar un porcentaje de los valores más bajos y más altos antes de promediar", "Multiplicar cada valor por un peso aleatorio", "Ordenar los datos y tomar el valor central"], "answer": 1, "explain": "Reduce la influencia de extremos eliminando colas antes de promediar.", "ref": "EDA Cap. 1"}, {"id": 48, "q": "La media ponderada se calcula como:", "options": ["sum(x_i) / n", "sum(w_i) / sum(x_i)", "sum(w_i * x_i) / sum(w_i)", "sum((x_i - x̄)^2)"], "answer": 2, "explain": "Promedio con pesos: Σ(w·x)/Σ(w).", "ref": "EDA Cap. 1"}, {"id": 49, "q": "¿Cuál es la fórmula correcta para la varianza muestral?", "options": ["Σ(x_i) / n", "Σ(x_i - x̄) / n", "Σ(x_i - x̄)^2 / n", "Σ(x_i - x̄)^2 / (n - 1)"], "answer": 3, "explain": "La varianza muestral usa (n-1) para corrección de sesgo (Bessel).", "ref": "EDA Cap. 1"}, {"id": 50, "q": "¿Qué relación describe la desviación estándar respecto a la varianza?", "options": ["SD = varianza^2", "SD = √(varianza)", "SD = 1 / varianza", "SD = varianza / n"], "answer": 1, "explain": "La desviación estándar es la raíz cuadrada de la varianza.", "ref": "EDA Cap. 1"}, {"id": 51, "q": "El IQR (rango intercuartílico) se define como:", "options": ["Q1 + Q3", "Q3 - Q1", "max - min", "media - mediana"], "answer": 1, "explain": "IQR = Q3 − Q1, mide dispersión robusta.", "ref": "EDA Cap. 1"}, {"id": 52, "q": "La regla típica para detectar outliers en un boxplot es marcar como outlier a valores:", "options": ["Fuera de [media ± 1 SD]", "Fuera de [Q1 − 1.5·IQR, Q3 + 1.5·IQR]", "Fuera de [0, 1]", "Con correlación negativa"], "answer": 1, "explain": "Regla estándar del boxplot: 1.5·IQR más allá de Q1/Q3.", "ref": "EDA Cap. 1"}, {"id": 53, "q": "¿Qué elemento representa la línea dentro de la caja en un boxplot?", "options": ["La media", "La mediana", "El máximo", "El IQR"], "answer": 1, "explain": "En el boxplot clásico, la línea dentro de la caja es la mediana.", "ref": "EDA Cap. 1"}, {"id": 54, "q": "¿Qué gráfica es más adecuada para ver la forma de una distribución numérica?", "options": ["Histograma", "Tabla de contingencia", "Diagrama de pastel", "Serie de tiempo"], "answer": 0, "explain": "El histograma (y densidad) muestran la forma general de la distribución.", "ref": "EDA Cap. 1"}, {"id": 55, "q": "¿Qué describe mejor el MAD (Median Absolute Deviation)?", "options": ["Promedio de desviaciones al cuadrado respecto a la media", "Mediana de |x_i − mediana(x)|, medida robusta de dispersión", "Diferencia entre el máximo y el mínimo", "Porcentaje de valores faltantes"], "answer": 1, "explain": "MAD = mediana(|x_i − mediana|). Muy robusta a outliers.", "ref": "EDA Cap. 1"}, {"id": 56, "q": "Para resumir una variable categórica, lo más básico es calcular:", "options": ["Derivadas", "Frecuencias y proporciones", "Varianza", "Autocorrelación"], "answer": 1, "explain": "En categóricas se usan conteos, porcentajes y moda.", "ref": "EDA Cap. 1"}, {"id": 57, "q": "Para analizar la relación entre dos variables categóricas, suele usarse:", "options": ["Tabla de contingencia (cross-tab)", "Histograma", "Boxplot", "Serie de tiempo"], "answer": 0, "explain": "Dos categóricas → tabla de contingencia para comparar proporciones.", "ref": "EDA Cap. 1"}, {"id": 58, "q": "El coeficiente de correlación de Pearson (r) mide principalmente:", "options": ["Relación causal", "Relación lineal entre dos variables numéricas", "Relación entre dos variables categóricas", "La diferencia entre medianas"], "answer": 1, "explain": "Pearson r mide asociación lineal (no causalidad).", "ref": "EDA Cap. 1"}, {"id": 59, "q": "Si r = 0, entonces:", "options": ["No existe ninguna relación entre las variables", "No hay relación lineal (pero podría existir relación no lineal)", "Hay relación causal negativa", "Las variables son independientes siempre"], "answer": 1, "explain": "r=0 descarta relación lineal, pero puede haber patrones no lineales.", "ref": "EDA Cap. 1"}, {"id": 60, "q": "¿Cuál afirmación es correcta?", "options": ["Correlación implica causalidad", "Causalidad implica siempre correlación perfecta", "Correlación no implica causalidad", "Si están correlacionadas, una debe ser categórica"], "answer": 2, "explain": "Asociación ≠ causa. Puede haber variables de confusión.", "ref": "EDA Cap. 1"}, {"id": 61, "q": "Según el Esquema 1, ¿con qué fase inicia el proceso una vez tomada la decisión de realizar un proyecto estadístico?", "options": ["Captación", "Planeación", "Procesamiento", "Presentación de resultados"], "answer": 1, "explain": "Tras decidir realizar el proyecto, se inicia con planeación para establecer las bases del trabajo.", "ref": "Pág. 13"}, {"id": 62, "q": "En el Esquema 1, ¿cuáles fases forman parte típicamente de la EJECUCIÓN del proyecto?", "options": ["Planeación, Diseño conceptual y Diseño del operativo", "Captación, Procesamiento y Presentación de resultados", "Evaluación de datos y Evaluación de procesos", "Programación, Organización y Presupuestación global"], "answer": 1, "explain": "La ejecución se ubica principalmente en captación, procesamiento y presentación de resultados.", "ref": "Pág. 13–14"}, {"id": 63, "q": "¿Cuál de los siguientes elementos NO corresponde a las macroactividades de la fase de Planeación?", "options": ["Definición de objetivos y estrategia general", "Programa general de actividades", "Determinación de la estructura de organización", "Codificación y captura de datos"], "answer": 3, "explain": "Codificación y captura pertenecen al procesamiento; planeación incluye objetivos/estrategia, programación, organización y presupuesto.", "ref": "Pág. 14–16"}, {"id": 64, "q": "¿Qué describe mejor la Planeación dentro del proceso de generación de estadísticas básicas?", "options": ["Solo la elaboración del cuestionario definitivo", "Definición formal de objetivos y estrategia, más programa de trabajo, organización y presupuesto global", "Validación de datos y corrección de inconsistencias", "Publicación de tabulados y mapas al público"], "answer": 1, "explain": "Integra objetivos/estrategia, programación, organización y presupuesto global.", "ref": "Pág. 14–15"}, {"id": 65, "q": "¿Cuál es un producto explícito de la fase de Planeación?", "options": ["Glosario", "Convenios con las fuentes de financiamiento", "Factores de expansión", "Cuadros y gráficas finales"], "answer": 1, "explain": "Entre productos de planeación: objetivos/estrategia, programa, organigrama, presupuesto y convenios de financiamiento.", "ref": "Pág. 16"}, {"id": 66, "q": "¿Qué enfatiza el documento sobre el control y soporte administrativos del proyecto?", "options": ["Que solo se requiere al final, durante la publicación", "Que debe proporcionar oportunamente recursos materiales/financieros y vigilar su uso eficiente, además de controlar operaciones", "Que sustituye a las actividades técnicas", "Que se limita a elaborar el glosario"], "answer": 1, "explain": "Se requiere soporte oportuno de recursos y control eficiente para cumplir metas/tiempos.", "ref": "Pág. 16"}, {"id": 67, "q": "¿Cuál es el propósito central del Diseño conceptual?", "options": ["Seleccionar entrevistadores y capacitarlos", "Identificar necesidades de información y definir marco conceptual, instrumentos de captación, criterios de validación y esquemas de resultados", "Recuperar materiales institucionales al cierre del operativo", "Calcular exclusivamente los factores de expansión"], "answer": 1, "explain": "Integra necesidades de información, marco conceptual, instrumentos, validación y diseño de resultados.", "ref": "Pág. 17"}, {"id": 68, "q": "La delimitación temática dentro del diseño conceptual ayuda principalmente a responder:", "options": ["Quién va a publicar los resultados", "Qué se va a captar y para qué se va a captar", "Cuántas oficinas se abrirán para el operativo", "Qué tipo de estimador es más bonito"], "answer": 1, "explain": "Busca precisar qué se captará y con qué finalidad, considerando costo, utilidad y factibilidad.", "ref": "Pág. 18"}, {"id": 69, "q": "¿Qué es el marco conceptual, según el documento?", "options": ["Una campaña publicitaria para sensibilizar informantes", "El ordenamiento de temas, categorías, variables y clasificaciones, incluyendo un glosario con definiciones", "La lista final de entrevistadores contratados", "El conjunto de tabulados ya publicados"], "answer": 1, "explain": "Ordena temas/categorías/variables/clasificaciones y se acompaña de un glosario con definiciones precisas.", "ref": "Pág. 18–20"}, {"id": 70, "q": "En el contexto de generación de estadística, una CATEGORÍA es:", "options": ["Un intervalo numérico dentro de una variable", "El conjunto objeto de cuantificación y caracterización (p. ej., personas, viviendas, establecimientos)", "Un sinónimo de “clase”", "Una regla para corregir omisiones"], "answer": 1, "explain": "Categorías son conjuntos que se cuantifican y caracterizan (personas, viviendas, hogares, etc.).", "ref": "Pág. 19"}, {"id": 71, "q": "¿Cuál enunciado describe mejor una VARIABLE en este contexto?", "options": ["El ordenamiento de modalidades cualitativas", "Un concepto que admite distintos valores y sirve para caracterizar o clasificar elementos (criterio de clasificación)", "Un reporte de incidencias del operativo", "El total general de un cuadro estadístico"], "answer": 1, "explain": "Variables admiten distintos valores y se usan para caracterizar/clasificar unidades o conjuntos.", "ref": "Pág. 19"}, {"id": 72, "q": "Una CLASIFICACIÓN se define como:", "options": ["El conjunto de cuestionarios contestados", "El ordenamiento de las modalidades cualitativas o intervalos numéricos admitidos por una variable", "La estimación del presupuesto global", "Una estrategia de comunicación para el proyecto"], "answer": 1, "explain": "Ordena modalidades o intervalos; cada modalidad/intervalo se denomina “clase”.", "ref": "Pág. 19"}, {"id": 73, "q": "¿Qué implica la definición de criterios de validación en el diseño conceptual?", "options": ["Solo revisar ortografía del cuestionario", "Establecer requisitos de integridad y congruencia, y reglas para tratar datos no válidos (omisión, inconsistencia, multirrespuesta)", "Definir la plantilla de entrevistadores", "Imprimir publicaciones finales"], "answer": 1, "explain": "Fija requisitos y reglas para resolver omisiones, inconsistencias o multirrespuesta.", "ref": "Pág. 21"}, {"id": 74, "q": "¿Cuál es una buena práctica destacada para el diseño y prueba del instrumento de captación?", "options": ["Aplicarlo por primera vez directamente a nivel nacional sin pruebas", "Probarlo en condiciones similares a las reales y ajustar con rigor metodológico", "Eliminar manuales e instructivos para simplificar", "Evitar la supervisión para no sesgar"], "answer": 1, "explain": "Se recomienda probar en condiciones similares y ajustar con rigor, usando técnicas de control de campo.", "ref": "Pág. 21"}, {"id": 75, "q": "¿Cuál de los siguientes NO aparece como producto del Diseño conceptual?", "options": ["Glosario", "Criterios de validación", "Esquemas para la presentación de resultados", "Cuestionarios contestados y ordenados para procesamiento"], "answer": 3, "explain": "Cuestionarios contestados son producto de la captación, no del diseño conceptual.", "ref": "Pág. 22 y 30"}, {"id": 76, "q": "En el Diseño de la muestra, ¿qué busca la elaboración del marco de muestreo?", "options": ["Crear mapas publicitarios para difusión", "Preparar listas/cartografía/directorios que identifiquen unidades a seleccionar y darles probabilidad conocida y distinta de cero", "Ordenar los tabulados de resultados", "Definir criterios para gráficos bonitos"], "answer": 1, "explain": "Permite identificar unidades y asignarles probabilidad conocida y distinta de cero de inclusión.", "ref": "Pág. 22"}, {"id": 77, "q": "¿Cuál es un elemento que se considera para calcular el tamaño de la muestra?", "options": ["El color del cuestionario", "Precisión y confianza requeridas, tasa de no respuesta esperada y efecto del diseño", "El número de oficinas administrativas del país", "La cantidad de mapas que habrá en el informe final"], "answer": 1, "explain": "Considera objetivos, valor estimado, precisión/confianza, no respuesta y efecto de diseño.", "ref": "Pág. 23"}, {"id": 78, "q": "¿Qué representa el factor de expansión en encuestas por muestreo?", "options": ["La cantidad de gráficos en una publicación", "El número de unidades de la población que representa cada unidad de la muestra según su probabilidad de selección", "El presupuesto global dividido entre oficinas", "Un tipo de clasificación cualitativa"], "answer": 1, "explain": "Cada unidad de muestra representa unidades en población; depende de la probabilidad de selección.", "ref": "Pág. 24"}, {"id": 79, "q": "¿Cuál describe mejor la fase de Captación?", "options": ["Preparar archivos electrónicos depurados y listos para tabular", "Obtener datos de la población o muestra con estructura operativa, controles, materiales de apoyo, RH y programación detallada", "Calcular coeficientes de variación y varianzas de estimadores", "Integrar informes metodológicos para usuarios"], "answer": 1, "explain": "Es el operativo para obtener datos con procedimientos, materiales, RH, comunicación y controles.", "ref": "Pág. 28–30"}, {"id": 80, "q": "La evaluación del proyecto cubre dos aspectos principales. ¿Cuáles son y para qué sirven?", "options": ["Publicidad y ventas; para aumentar ingresos", "Proceso y datos; el proceso aporta referencias para futuros proyectos y los datos orientan sobre cobertura/sesgo/inconsistencias", "Diseño gráfico y colorimetría; para mejorar mapas", "Censo y registro; para decidir el nombre del proyecto"], "answer": 1, "explain": "Evalúa proceso (mejoras y referencia futura) y resultados/datos (cobertura, sesgo, inconsistencias).", "ref": "Pág. 35"}];
+
+function shuffleInPlace(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+function deepClone(x){ return JSON.parse(JSON.stringify(x)); }
+
+function prepareQuestions(raw){
+  let qs = deepClone(raw);
+  shuffleInPlace(qs);
+  // mezclar opciones por pregunta + ajustar answer
+  qs = qs.map(q=>{
+    const indexed = q.options.map((t,idx)=>({t,idx}));
+    shuffleInPlace(indexed);
+    const newAns = indexed.findIndex(o=>o.idx===q.answer);
+    return {...q, options:indexed.map(o=>o.t), answer:newAns};
+  });
+  return qs;
+}
+
+let QUESTIONS = [];
+let idx = 0;
+let answers = [];
+let graded = false;
+let score = null;
+
+const elProgress = document.getElementById("pillProgress");
+const elAnswered = document.getElementById("pillAnswered");
+const elQnum = document.getElementById("qnum");
+const elQtext = document.getElementById("qtext");
+const elQref = document.getElementById("qref");
+const elOpts = document.getElementById("opts");
+const elMsg = document.getElementById("msg");
+const elExplain = document.getElementById("explain");
+const elScoreBox = document.getElementById("scoreBox");
+const elScoreText = document.getElementById("scoreText");
+const elScoreHint = document.getElementById("scoreHint");
+
+function updatePills(){
+  elProgress.textContent = `Pregunta ${idx+1} / ${QUESTIONS.length}`;
+  const answered = answers.filter(a=>a!==null).length;
+  elAnswered.textContent = `Respondidas: ${answered}/${QUESTIONS.length}`;
+}
+
+function render(){
+  elMsg.textContent = "";
+  const q = QUESTIONS[idx];
+
+  elQnum.textContent = `ID ${q.id}`;
+  elQtext.textContent = q.q;
+  elQref.textContent = q.ref ? `Referencia: ${q.ref}` : "";
+
+  elOpts.innerHTML = "";
+  elExplain.classList.remove("show");
+
+  q.options.forEach((optText, oi)=>{
+    const lab = document.createElement("label");
+    lab.className = "opt";
+
+    const rb = document.createElement("input");
+    rb.type = "radio";
+    rb.name = "opt";
+    rb.value = String(oi);
+    rb.disabled = graded;
+
+    if(answers[idx] === oi) rb.checked = true;
+
+    rb.addEventListener("change", ()=>{
+      answers[idx] = oi;
+      updatePills();
+    });
+
+    const span = document.createElement("div");
+    span.textContent = optText;
+
+    lab.appendChild(rb);
+    lab.appendChild(span);
+    elOpts.appendChild(lab);
+
+    // si ya está calificado, marcar correcta/incorrecta en UI
+    if(graded){
+      if(oi === q.answer) lab.classList.add("ok");
+      if(answers[idx] !== null && answers[idx] === oi && oi !== q.answer) lab.classList.add("bad");
+    }
+  });
+
+  if(graded){
+    const your = (answers[idx] === null) ? "Sin responder" : q.options[answers[idx]];
+    const corr = q.options[q.answer];
+    elExplain.innerHTML = `<b>Explicación:</b> ${escapeHtml(q.explain || "")}<br><br><b>Tu respuesta:</b> ${escapeHtml(your)}<br><b>Correcta:</b> ${escapeHtml(corr)}`;
+    elExplain.classList.add("show");
+  }
+
+  document.getElementById("btnPrev").disabled = (idx === 0);
+  document.getElementById("btnNext").disabled = (idx === QUESTIONS.length-1);
+
+  updatePills();
+}
+
+function escapeHtml(s){
+  return String(s)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function computeScore(){
+  let c=0;
+  for(let i=0;i<QUESTIONS.length;i++){
+    if(answers[i] === QUESTIONS[i].answer) c++;
+  }
+  return c;
+}
+
+function goPrev(){
+  if(idx>0){ idx--; render(); }
+}
+
+function goNext(){
+  if(idx<QUESTIONS.length-1){ idx++; render(); }
+}
+
+function grade(){
+  if(graded){
+    elMsg.textContent = "Ya calificaste. Presiona “Mezclar / Reiniciar” para intentar de nuevo.";
+    return;
+  }
+  const firstUnanswered = answers.findIndex(a=>a===null);
+  if(firstUnanswered !== -1){
+    idx = firstUnanswered;
+    elMsg.textContent = `Te falta responder la pregunta ${idx+1}.`;
+    render();
+    return;
+  }
+  graded = true;
+  score = computeScore();
+  const pct = Math.round((score/QUESTIONS.length)*100);
+
+  elScoreBox.classList.add("show");
+  elScoreText.textContent = `Resultado: ${score}/${QUESTIONS.length} (${pct}%)`;
+  elScoreHint.textContent = "Modo revisión activado: navega con Anterior/Siguiente para ver explicación y la respuesta correcta.";
+
+  render();
+}
+
+function mix(){
+  QUESTIONS = prepareQuestions(RAW);
+  answers = new Array(QUESTIONS.length).fill(null);
+  idx = 0;
+  graded = false;
+  score = null;
+  elScoreBox.classList.remove("show");
+  elMsg.textContent = "";
+  render();
+}
+
+document.getElementById("btnPrev").addEventListener("click", goPrev);
+document.getElementById("btnNext").addEventListener("click", goNext);
+document.getElementById("btnGrade").addEventListener("click", grade);
+document.getElementById("btnMix").addEventListener("click", mix);
+
+mix();
+</script>
+</body>
+</html>
