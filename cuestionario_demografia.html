@@ -1,0 +1,369 @@
+
+    html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Cuestionario - Fuentes de Datos Demográficos</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                padding: 20px;
+            }
+            
+            .container {
+                max-width: 800px;
+                margin: 0 auto;
+                background: white;
+                border-radius: 20px;
+                padding: 40px;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            }
+            
+            h1 {
+                text-align: center;
+                color: #333;
+                margin-bottom: 10px;
+                font-size: 2em;
+            }
+            
+            .subtitulo {
+                text-align: center;
+                color: #666;
+                margin-bottom: 30px;
+                font-style: italic;
+            }
+            
+            .progreso {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+                padding: 10px 20px;
+                background: #f0f0f0;
+                border-radius: 10px;
+            }
+            
+            .barra-progreso {
+                flex: 1;
+                height: 10px;
+                background: #ddd;
+                border-radius: 5px;
+                margin: 0 15px;
+                overflow: hidden;
+            }
+            
+            .barra-progreso-interna {
+                height: 100%;
+                background: #4CAF50;
+                border-radius: 5px;
+                transition: width 0.3s ease;
+            }
+            
+            .pregunta-container {
+                margin: 25px 0;
+            }
+            
+            .pregunta-texto {
+                font-size: 1.2em;
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 20px;
+                line-height: 1.5;
+            }
+            
+            .opciones {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .opcion {
+                padding: 15px 20px;
+                border: 2px solid #e0e0e0;
+                border-radius: 12px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-size: 1.05em;
+                background: #fafafa;
+            }
+            
+            .opcion:hover {
+                border-color: #667eea;
+                background: #f0f3ff;
+                transform: translateX(5px);
+            }
+            
+            .opcion.seleccionada {
+                border-color: #667eea;
+                background: #e8ecff;
+                transform: translateX(5px);
+            }
+            
+            .opcion.correcta {
+                border-color: #4CAF50;
+                background: #e8f5e9;
+            }
+            
+            .opcion.incorrecta {
+                border-color: #f44336;
+                background: #fbe9e7;
+            }
+            
+            .feedback {
+                margin-top: 20px;
+                padding: 15px;
+                border-radius: 10px;
+                display: none;
+            }
+            
+            .feedback.mostrar {
+                display: block;
+            }
+            
+            .feedback.correcto {
+                background: #e8f5e9;
+                border: 1px solid #4CAF50;
+            }
+            
+            .feedback.incorrecto {
+                background: #fbe9e7;
+                border: 1px solid #f44336;
+            }
+            
+            .botones {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 30px;
+                gap: 15px;
+            }
+            
+            button {
+                padding: 12px 30px;
+                border: none;
+                border-radius: 8px;
+                font-size: 1em;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+            
+            .btn-verificar {
+                background: #667eea;
+                color: white;
+            }
+            
+            .btn-verificar:hover:not(:disabled) {
+                background: #5a6fd6;
+                transform: translateY(-2px);
+            }
+            
+            .btn-siguiente {
+                background: #4CAF50;
+                color: white;
+            }
+            
+            .btn-siguiente:hover {
+                background: #45a049;
+                transform: translateY(-2px);
+            }
+            
+            button:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+            
+            .resultado-final {
+                display: none;
+                text-align: center;
+                margin-top: 30px;
+            }
+            
+            .resultado-final.activo {
+                display: block;
+            }
+            
+            .puntaje {
+                font-size: 3em;
+                font-weight: bold;
+                color: #667eea;
+            }
+            
+            .oculto {
+                display: none;
+            }
+            
+            @media (max-width: 600px) {
+                .container {
+                    padding: 20px;
+                }
+                h1 {
+                    font-size: 1.5em;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>📊 Cuestionario de Demografía</h1>
+            <p class="subtitulo">Capítulo II: Fuentes de Datos Demográficos<br>
+                Basado en "Demografía I" - PROLAP/CELADE (1997)</p>
+            
+            <div id="zona-cuestionario">
+                <div class="progreso">
+                    <span id="contador-pregunta">Pregunta 1/10</span>
+                    <div class="barra-progreso">
+                        <div class="barra-progreso-interna" id="barra-progreso-interna" style="width: 0%"></div>
+                    </div>
+                    <span id="contador-puntaje">Puntaje: 0</span>
+                </div>
+                
+                <div class="pregunta-container">
+                    <div class="pregunta-texto" id="texto-pregunta"></div>
+                    <div class="opciones" id="contenedor-opciones"></div>
+                </div>
+                
+                <div class="feedback" id="feedback"></div>
+                
+                <div class="botones">
+                    <button class="btn-siguiente oculto" id="btn-siguiente" onclick="siguientePregunta()">Siguiente ➡️</button>
+                </div>
+            </div>
+            
+            <div class="resultado-final" id="resultado-final">
+                <h2>🎉 ¡Cuestionario Completado!</h2>
+                <p class="puntaje" id="puntaje-final"></p>
+                <p id="mensaje-resultado"></p>
+                <button onclick="reiniciarCuestionario()" style="background: #667eea; color: white; margin-top: 20px;">
+                    🔄 Volver a Intentar
+                </button>
+            </div>
+        </div>
+
+        <script>
+            const preguntas = [{"id": 1, "pregunta": "Según el objetivo de recolección, un dato que se utiliza en una investigación sin haber sido recolectado específicamente para ella se denomina:", "opciones": {"a": "Dato primario", "b": "Dato secundario", "c": "Dato bruto", "d": "Dato directo"}, "respuesta_correcta": "b", "explicacion": "Los datos secundarios son aquellos que ya existen y son utilizados por un investigador que no participó en su recolección original."}, {"id": 2, "pregunta": "¿Cuál de las siguientes NO es una característica esencial de un censo de población?", "opciones": {"a": "Universalidad", "b": "Simultaneidad", "c": "Muestreo representativo", "d": "Auspicio oficial"}, "respuesta_correcta": "c", "explicacion": "El censo, por definición, debe ser universal (cubrir a toda la población), no se basa en una muestra. Las encuestas son las que utilizan muestreo."}, {"id": 3, "pregunta": "El tipo de empadronamiento censal que registra a las personas en el lugar donde pasaron la noche anterior se conoce como:", "opciones": {"a": "Censo de jure", "b": "Censo de derecho", "c": "Censo de facto", "d": "Censo permanente"}, "respuesta_correcta": "c", "explicacion": "El censo 'de facto' o 'de hecho' empadrona a la persona donde se encuentra en el momento del censo, usualmente preguntando dónde pasó la noche anterior. El 'de jure' se basa en la residencia habitual."}, {"id": 4, "pregunta": "¿Cuál es la principal ventaja de las encuestas demográficas en comparación con los censos?", "opciones": {"a": "Cubren a toda la población sin excepción", "b": "Permiten incluir una mayor cantidad de preguntas y profundizar en temas específicos", "c": "No presentan ningún tipo de error", "d": "Son la fuente principal para la medición directa de la migración"}, "respuesta_correcta": "b", "explicacion": "Al usar muestras, las encuestas son más económicas y pueden contener cuestionarios más extensos y detallados que un censo."}, {"id": 5, "pregunta": "Los registros oficiales, continuos y compulsivos de hechos como nacimientos, defunciones y matrimonios se denominan:", "opciones": {"a": "Censos de población", "b": "Encuestas retrospectivas", "c": "Estadísticas vitales", "d": "Encuestas prospectivas"}, "respuesta_correcta": "c", "explicacion": "Las estadísticas vitales son llevadas por el Registro Civil y son la fuente primordial para estudiar la mortalidad y la fecundidad."}, {"id": 6, "pregunta": "La omisión de personas en un censo de población se clasifica como un error de:", "opciones": {"a": "Contenido", "b": "Muestreo", "c": "Cobertura", "d": "Codificación"}, "respuesta_correcta": "c", "explicacion": "Los errores de cobertura se refieren a fallas en la contabilidad de personas o hechos, como la sub o sobre-enumeración (omisión)."}, {"id": 7, "pregunta": "Un fenómeno típico de error de contenido en los censos, donde ciertas edades (como las terminadas en 0 o 5) concentran más población de la esperada, se conoce como:", "opciones": {"a": "Omisión censal", "b": "Mala declaración de la edad por preferencia de dígitos", "c": "Error de cobertura geográfica", "d": "Duplicación de inscripciones"}, "respuesta_correcta": "b", "explicacion": "Es un clásico error de contenido donde los informantes tienden a redondear su edad, causando una sobrerrepresentación en dígitos específicos."}, {"id": 8, "pregunta": "Para evaluar la calidad de los datos demográficos, un procedimiento común es comparar la diferencia entre un valor estimado y un valor registrado. Si esta diferencia es positiva, generalmente indica:", "opciones": {"a": "Sobrerregistro o sobreenumeración", "b": "Subregistro u omisión", "c": "Un error de contenido", "d": "Una perfecta cobertura"}, "respuesta_correcta": "b", "explicacion": "La fórmula (Valor Estimado - Valor Registrado) / Valor Estimado, si arroja un resultado positivo, significa que el valor registrado es menor que el real, por lo tanto, hay subregistro u omisión."}, {"id": 9, "pregunta": "¿Qué tipo de encuesta demográfica registra de manera reiterada los hechos vitales de una misma población a lo largo de un periodo?", "opciones": {"a": "Encuesta retrospectiva", "b": "Encuesta prospectiva o de visitas repetidas", "c": "Censo experimental", "d": "Encuesta de prevalencia anticonceptiva"}, "respuesta_correcta": "b", "explicacion": "Las encuestas prospectivas siguen a una población en el tiempo para registrar los eventos que ocurren, como nacimientos o defunciones."}, {"id": 10, "pregunta": "¿Cuál de las siguientes fuentes es considerada la más importante y exhaustiva para registrar los cambios en la magnitud y composición de la población, y es básica para el estudio de la migración?", "opciones": {"a": "Las estadísticas vitales", "b": "Las encuestas demográficas", "c": "Los registros de aduanas", "d": "El censo de población"}, "respuesta_correcta": "d", "explicacion": "Por su universalidad y la cantidad de variables que recoge, el censo es la fuente fundamental para el análisis demográfico, especialmente para la migración."}];
+            let preguntaActual = 0;
+            let puntaje = 0;
+            let totalPreguntas = preguntas.length;
+            let seleccionRealizada = false;
+
+            function cargarPregunta() {
+                if (preguntaActual >= totalPreguntas) {
+                    mostrarResultadoFinal();
+                    return;
+                }
+                
+                seleccionRealizada = false;
+                document.getElementById('btn-siguiente').classList.add('oculto');
+                document.getElementById('feedback').classList.remove('mostrar', 'correcto', 'incorrecto');
+                document.getElementById('feedback').innerHTML = '';
+                
+                const p = preguntas[preguntaActual];
+                document.getElementById('texto-pregunta').textContent = `${p.id}. ${p.pregunta}`;
+                
+                let opcionesHTML = '';
+                const opcionesOrdenadas = Object.entries(p.opciones).sort();
+                for (let [letra, texto] of opcionesOrdenadas) {
+                    opcionesHTML += `
+                        <div class="opcion" onclick="seleccionarOpcion('${letra}')" id="opcion-${letra}">
+                            <strong>${letra})</strong> ${texto}
+                        </div>`;
+                }
+                document.getElementById('contenedor-opciones').innerHTML = opcionesHTML;
+                
+                // Actualizar progreso
+                document.getElementById('contador-pregunta').textContent = 
+                    `Pregunta ${Math.min(preguntaActual + 1, totalPreguntas)}/${totalPreguntas}`;
+                document.getElementById('barra-progreso-interna').style.width = 
+                    `${((preguntaActual + 1) / totalPreguntas) * 100}%`;
+            }
+
+            function seleccionarOpcion(letra) {
+                if (seleccionRealizada) return;
+                seleccionRealizada = true;
+                
+                const p = preguntas[preguntaActual];
+                const esCorrecta = letra === p.respuesta_correcta;
+                
+                // Marcar opciones visualmente
+                document.getElementById(`opcion-${p.respuesta_correcta}`).classList.add('correcta');
+                if (!esCorrecta) {
+                    document.getElementById(`opcion-${letra}`).classList.add('incorrecta');
+                }
+                
+                // Actualizar puntaje
+                if (esCorrecta) {
+                    puntaje++;
+                    document.getElementById('contador-puntaje').textContent = `Puntaje: ${puntaje}`;
+                }
+                
+                // Mostrar feedback
+                const feedback = document.getElementById('feedback');
+                let feedbackHTML = '';
+                if (esCorrecta) {
+                    feedbackHTML = '<strong>✅ ¡Correcto!</strong><br>';
+                    feedback.classList.add('correcto');
+                    feedback.classList.remove('incorrecto');
+                } else {
+                    feedbackHTML = '<strong>❌ Incorrecto.</strong><br>';
+                    feedbackHTML += `La respuesta correcta es: <strong>${p.respuesta_correcta}) ${p.opciones[p.respuesta_correcta]}</strong><br>`;
+                    feedback.classList.add('incorrecto');
+                    feedback.classList.remove('correcto');
+                }
+                feedbackHTML += `💡 ${p.explicacion}`;
+                feedback.innerHTML = feedbackHTML;
+                feedback.classList.add('mostrar');
+                
+                // Mostrar botón siguiente
+                document.getElementById('btn-siguiente').classList.remove('oculto');
+            }
+
+            function siguientePregunta() {
+                preguntaActual++;
+                cargarPregunta();
+            }
+
+            function mostrarResultadoFinal() {
+                document.getElementById('zona-cuestionario').classList.add('oculto');
+                document.getElementById('resultado-final').classList.add('activo');
+                
+                const porcentaje = Math.round((puntaje / totalPreguntas) * 100);
+                document.getElementById('puntaje-final').textContent = 
+                    `${puntaje} / ${totalPreguntas} (${porcentaje}%)`;
+                
+                let mensaje = '';
+                if (porcentaje === 100) {
+                    mensaje = '🏆 ¡Excelente! Dominas completamente las fuentes de datos demográficos.';
+                } else if (porcentaje >= 80) {
+                    mensaje = '🌟 ¡Muy bien! Tienes un sólido conocimiento del tema.';
+                } else if (porcentaje >= 60) {
+                    mensaje = '👍 Bien. Se recomienda repasar los conceptos de errores y tipos de encuestas.';
+                } else {
+                    mensaje = '📚 Te conviene repasar el capítulo, especialmente la clasificación de datos y fuentes.';
+                }
+                document.getElementById('mensaje-resultado').textContent = mensaje;
+            }
+
+            function reiniciarCuestionario() {
+                preguntaActual = 0;
+                puntaje = 0;
+                document.getElementById('contador-puntaje').textContent = 'Puntaje: 0';
+                document.getElementById('zona-cuestionario').classList.remove('oculto');
+                document.getElementById('resultado-final').classList.remove('activo');
+                cargarPregunta();
+            }
+
+            // Iniciar cuestionario
+            cargarPregunta();
+        </script>
+    </body>
+    </html>
+    
