@@ -1,0 +1,345 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Fuentes de Información Demográfica</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.7em;
+        }
+        
+        .subtitulo {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-style: italic;
+            font-size: 0.95em;
+        }
+        
+        .progreso {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+        
+        .barra-progreso {
+            flex: 1;
+            height: 10px;
+            background: #ddd;
+            border-radius: 5px;
+            margin: 0 15px;
+            overflow: hidden;
+        }
+        
+        .barra-progreso-interna {
+            height: 100%;
+            background: #4CAF50;
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+        
+        .pregunta-container {
+            margin: 25px 0;
+        }
+        
+        .pregunta-texto {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .opciones {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .opcion {
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.05em;
+            background: #fafafa;
+        }
+        
+        .opcion:hover {
+            border-color: #667eea;
+            background: #f0f3ff;
+            transform: translateX(5px);
+        }
+        
+        .opcion.correcta {
+            border-color: #4CAF50;
+            background: #e8f5e9;
+        }
+        
+        .opcion.incorrecta {
+            border-color: #f44336;
+            background: #fbe9e7;
+        }
+        
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .feedback.mostrar {
+            display: block;
+        }
+        
+        .feedback.correcto {
+            background: #e8f5e9;
+            border: 1px solid #4CAF50;
+        }
+        
+        .feedback.incorrecto {
+            background: #fbe9e7;
+            border: 1px solid #f44336;
+        }
+        
+        .botones {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+        
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-siguiente {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-siguiente:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        
+        .oculto {
+            display: none;
+        }
+        
+        .resultado-final {
+            display: none;
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .resultado-final.activo {
+            display: block;
+        }
+        
+        .puntaje {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.3em;
+            }
+            .pregunta-texto {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Cuestionario de Demografía</h1>
+        <p class="subtitulo">Capítulo 6: Fuentes de Información Demográfica<br>
+            Basado en el "Manual de Demografía" - Universidad de la República, Uruguay</p>
+        
+        <div id="zona-cuestionario">
+            <div class="progreso">
+                <span id="contador-pregunta">Pregunta 1/10</span>
+                <div class="barra-progreso">
+                    <div class="barra-progreso-interna" id="barra-progreso-interna" style="width: 0%"></div>
+                </div>
+                <span id="contador-puntaje">Puntaje: 0</span>
+            </div>
+            
+            <div class="pregunta-container">
+                <div class="pregunta-texto" id="texto-pregunta"></div>
+                <div class="opciones" id="contenedor-opciones"></div>
+            </div>
+            
+            <div class="feedback" id="feedback"></div>
+            
+            <div class="botones">
+                <button class="btn-siguiente oculto" id="btn-siguiente" onclick="siguientePregunta()">Siguiente ➡️</button>
+            </div>
+        </div>
+        
+        <div class="resultado-final" id="resultado-final">
+            <h2>🎉 ¡Cuestionario Completado!</h2>
+            <p class="puntaje" id="puntaje-final"></p>
+            <p id="mensaje-resultado"></p>
+            <button onclick="reiniciarCuestionario()" style="background: #667eea; color: white; margin-top: 20px;">
+                🔄 Volver a Intentar
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const preguntas = [{"id": 1, "pregunta": "Según el manual, ¿cuál es la clasificación de las tres fuentes de información demográfica 'tradicionales'?", "opciones": {"a": "Censos, encuestas y big data", "b": "Censos, encuestas y registros administrativos", "c": "Registros vitales, padrones y redes sociales", "d": "Estadísticas vitales, proyecciones y entrevistas"}, "respuesta_correcta": "b", "explicacion": "El capítulo clasifica las fuentes tradicionales en: 1) censos, 2) encuestas y 3) registros administrativos. El big data se presenta como una cuarta fuente emergente."}, {"id": 2, "pregunta": "¿Qué innovación tecnológica incorporó el censo uruguayo de 2011 en la recolección de información?", "opciones": {"a": "Uso de drones para mapeo territorial", "b": "Encuesta exclusiva por internet", "c": "Dispositivos Electrónicos Portátiles (DEP)", "d": "Escáner de huellas dactilares"}, "respuesta_correcta": "c", "explicacion": "El censo de 2011 fue el primero en Uruguay en utilizar Dispositivos Electrónicos Portátiles (DEP) para el relevamiento de información, lo que permitió la verificación automática de coherencia de datos como la edad y fecha de nacimiento."}, {"id": 3, "pregunta": "¿Cuál es la principal diferencia entre un 'censo de hecho' (de facto) y un 'censo de derecho' (de iure)?", "opciones": {"a": "El de hecho se realiza cada 5 años, el de derecho cada 10", "b": "El de hecho censa donde la persona pasa la noche anterior; el de derecho, en su residencia habitual", "c": "El de hecho solo cuenta hombres; el de derecho cuenta ambos sexos", "d": "El de hecho es voluntario; el de derecho es obligatorio"}, "respuesta_correcta": "b", "explicacion": "El censo 'de hecho' empadrona a la población en el lugar donde se encuentra el día del censo (ej. donde pernoctó). El 'de derecho' censa a las personas en su lugar de residencia habitual, estén o no presentes."}, {"id": 4, "pregunta": "¿Qué pregunta sobre migración se recomienda incluir en los censos para estimar tasas de migración reciente?", "opciones": {"a": "Lugar de nacimiento de los padres", "b": "Lugar de residencia 5 años antes del censo", "c": "Número de veces que ha viajado al exterior", "d": "Intención de migrar en el próximo año"}, "respuesta_correcta": "b", "explicacion": "Para estimar tasas de migración reciente (período quinquenal), los censos incluyen la pregunta sobre el lugar de residencia en una fecha fija anterior, generalmente 5 años antes del relevamiento."}, {"id": 5, "pregunta": "¿Qué organismo es el responsable en Uruguay de registrar los hechos vitales (nacimientos y defunciones) con fines estadísticos?", "opciones": {"a": "Instituto Nacional de Estadística (INE)", "b": "Ministerio de Salud Pública (MSP)", "c": "Dirección Nacional de Migración (DNM)", "d": "Banco de Previsión Social (BPS)"}, "respuesta_correcta": "b", "explicacion": "En Uruguay, el Ministerio de Salud Pública (MSP) es el encargado de recopilar y procesar la información sobre nacimientos (Certificado de Nacido Vivo) y defunciones con fines estadísticos."}, {"id": 6, "pregunta": "¿Qué es el 'big data' aplicado a la demografía, según el capítulo?", "opciones": {"a": "Los microdatos censales almacenados en grandes servidores", "b": "La información anonimizada generada por usuarios de dispositivos móviles, internet y redes sociales", "c": "Las estadísticas vitales de países con más de 100 millones de habitantes", "d": "Los resultados de encuestas con muestras superiores a 1 millón de personas"}, "respuesta_correcta": "b", "explicacion": "El capítulo define big data como la información anonimizada generada por usuarios de dispositivos móviles, plataformas basadas en internet o imágenes satelitales. Su rasgo distintivo es que no se produce con fines estadísticos."}, {"id": 7, "pregunta": "Además de la población total, ¿cuál es otra utilidad fundamental de los censos de población?", "opciones": {"a": "Medir la calidad del aire en las ciudades", "b": "Servir como marco muestral para las encuestas de hogares", "c": "Determinar las causas de muerte de la población", "d": "Registrar en tiempo real los matrimonios y divorcios"}, "respuesta_correcta": "b", "explicacion": "Una de las utilidades clave de los censos es proporcionar el marco muestral (listado actualizado de viviendas y población) para la selección de muestras representativas en las encuestas de hogares."}, {"id": 8, "pregunta": "¿Cuál es una limitación importante de los permisos de residencia como fuente para estudiar la inmigración?", "opciones": {"a": "Registran únicamente a la migración irregular", "b": "Reflejan solo el stock de migrantes, no los flujos anuales", "c": "Solo captan a la población que emigra, no a la que inmigra", "d": "Solo captan migración legal, excluyendo a la migración irregular"}, "respuesta_correcta": "d", "explicacion": "El capítulo señala que los permisos de residencia tienen la limitación de referirse únicamente a la migración legal (regular), no captando a quienes se encuentran en situación migratoria irregular."}, {"id": 9, "pregunta": "¿Qué método utilizó Uruguay para evaluar la cobertura del censo de 2011, según el capítulo?", "opciones": {"a": "Solo una encuesta post-censal (ENEC)", "b": "Combinación de una encuesta post-censal (ENEC) y un método indirecto basado en la ecuación compensadora", "c": "Comparación exclusiva con el censo de Argentina", "d": "Un modelo matemático de inteligencia artificial"}, "respuesta_correcta": "b", "explicacion": "El capítulo detalla que la evaluación del censo 2011 combinó una encuesta post-censal (ENEC) con un método indirecto demográfico (ecuación compensadora), recomendándose este último por mayor consistencia con la dinámica demográfica."}, {"id": 10, "pregunta": "¿Qué aspecto del censo de población en Uruguay ha mejorado notablemente la calidad de la declaración de la edad, según el capítulo?", "opciones": {"a": "La aplicación de multas por declaración incorrecta", "b": "La incorporación conjunta de la pregunta de 'fecha de nacimiento' junto a 'edad cumplida', con verificación automática en DEP", "c": "La reducción del número de preguntas en el cuestionario", "d": "La realización del censo exclusivamente en línea"}, "respuesta_correcta": "b", "explicacion": "El capítulo destaca que la inclusión combinada de las preguntas sobre 'edad' y 'fecha de nacimiento', junto al uso de DEP que verificaban automáticamente la consistencia, mejoró drásticamente la calidad del dato de edad en el censo 2011."}];
+        let preguntaActual = 0;
+        let puntaje = 0;
+        let totalPreguntas = preguntas.length;
+        let seleccionRealizada = false;
+
+        function cargarPregunta() {
+            if (preguntaActual >= totalPreguntas) {
+                mostrarResultadoFinal();
+                return;
+            }
+            
+            seleccionRealizada = false;
+            document.getElementById('btn-siguiente').classList.add('oculto');
+            document.getElementById('feedback').classList.remove('mostrar', 'correcto', 'incorrecto');
+            document.getElementById('feedback').innerHTML = '';
+            
+            const p = preguntas[preguntaActual];
+            document.getElementById('texto-pregunta').textContent = `${p.id}. ${p.pregunta}`;
+            
+            let opcionesHTML = '';
+            const opcionesOrdenadas = Object.entries(p.opciones).sort();
+            for (let [letra, texto] of opcionesOrdenadas) {
+                opcionesHTML += `
+                    <div class="opcion" onclick="seleccionarOpcion('${letra}')" id="opcion-${letra}">
+                        <strong>${letra})</strong> ${texto}
+                    </div>`;
+            }
+            document.getElementById('contenedor-opciones').innerHTML = opcionesHTML;
+            
+            document.getElementById('contador-pregunta').textContent = 
+                `Pregunta ${Math.min(preguntaActual + 1, totalPreguntas)}/${totalPreguntas}`;
+            document.getElementById('barra-progreso-interna').style.width = 
+                `${((preguntaActual + 1) / totalPreguntas) * 100}%`;
+        }
+
+        function seleccionarOpcion(letra) {
+            if (seleccionRealizada) return;
+            seleccionRealizada = true;
+            
+            const p = preguntas[preguntaActual];
+            const esCorrecta = letra === p.respuesta_correcta;
+            
+            document.getElementById(`opcion-${p.respuesta_correcta}`).classList.add('correcta');
+            if (!esCorrecta) {
+                document.getElementById(`opcion-${letra}`).classList.add('incorrecta');
+            }
+            
+            if (esCorrecta) {
+                puntaje++;
+                document.getElementById('contador-puntaje').textContent = `Puntaje: ${puntaje}`;
+            }
+            
+            const feedback = document.getElementById('feedback');
+            let feedbackHTML = '';
+            if (esCorrecta) {
+                feedbackHTML = '<strong>✅ ¡Correcto!</strong><br>';
+                feedback.classList.add('correcto');
+                feedback.classList.remove('incorrecto');
+            } else {
+                feedbackHTML = '<strong>❌ Incorrecto.</strong><br>';
+                feedbackHTML += `La respuesta correcta es: <strong>${p.respuesta_correcta}) ${p.opciones[p.respuesta_correcta]}</strong><br>`;
+                feedback.classList.add('incorrecto');
+                feedback.classList.remove('correcto');
+            }
+            feedbackHTML += `💡 ${p.explicacion}`;
+            feedback.innerHTML = feedbackHTML;
+            feedback.classList.add('mostrar');
+            
+            document.getElementById('btn-siguiente').classList.remove('oculto');
+        }
+
+        function siguientePregunta() {
+            preguntaActual++;
+            cargarPregunta();
+        }
+
+        function mostrarResultadoFinal() {
+            document.getElementById('zona-cuestionario').classList.add('oculto');
+            document.getElementById('resultado-final').classList.add('activo');
+            
+            const porcentaje = Math.round((puntaje / totalPreguntas) * 100);
+            document.getElementById('puntaje-final').textContent = 
+                `${puntaje} / ${totalPreguntas} (${porcentaje}%)`;
+            
+            let mensaje = '';
+            if (porcentaje === 100) {
+                mensaje = '🏆 ¡Excelente! Dominas completamente el Capítulo 6.';
+            } else if (porcentaje >= 80) {
+                mensaje = '🌟 ¡Muy bien! Tienes un sólido conocimiento de las fuentes de información demográfica.';
+            } else if (porcentaje >= 60) {
+                mensaje = '👍 Bien. Te sugerimos repasar la diferencia entre censos de hecho/derecho y los registros administrativos.';
+            } else {
+                mensaje = '📚 Te conviene repasar el capítulo 6, especialmente las clasificaciones de fuentes y los casos de Uruguay.';
+            }
+            document.getElementById('mensaje-resultado').textContent = mensaje;
+        }
+
+        function reiniciarCuestionario() {
+            preguntaActual = 0;
+            puntaje = 0;
+            document.getElementById('contador-puntaje').textContent = 'Puntaje: 0';
+            document.getElementById('zona-cuestionario').classList.remove('oculto');
+            document.getElementById('resultado-final').classList.remove('activo');
+            cargarPregunta();
+        }
+
+        cargarPregunta();
+    </script>
+</body>
+</html>
+    
