@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario Interactivo - Capítulos I y II</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 35px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        h1 {
+            text-align: center;
+            color: #f0f0f0;
+            margin-bottom: 8px;
+            font-size: 1.8em;
+            letter-spacing: 1px;
+        }
+
+        .subtitulo {
+            text-align: center;
+            color: #a0a0c0;
+            margin-bottom: 30px;
+            font-size: 0.95em;
+            font-weight: 300;
+        }
+
+        .progreso {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.05em;
+            color: #c0c0e0;
+            font-weight: 500;
+        }
+
+        .barra-progreso {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .barra-progreso-interna {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .pregunta-container {
+            display: none;
+            animation: fadeSlideIn 0.45s ease;
+        }
+
+        .pregunta-container.activa {
+            display: block;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .numero-pregunta {
+            color: #667eea;
+            font-weight: 700;
+            font-size: 1em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .texto-pregunta {
+            background: rgba(102, 126, 234, 0.08);
+            border-left: 5px solid #667eea;
+            padding: 18px 22px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 1.15em;
+            line-height: 1.6;
+            color: #e8e8f0;
+        }
+
+        .opciones {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .opcion {
+            background: rgba(255, 255, 255, 0.04);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 14px 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: #d0d0e0;
+        }
+
+        .opcion:hover {
+            background: rgba(102, 126, 234, 0.12);
+            border-color: rgba(102, 126, 234, 0.5);
+            transform: translateX(6px);
+        }
+
+        .opcion.seleccionada {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+            box-shadow: 0 0 18px rgba(102, 126, 234, 0.25);
+        }
+
+        .opcion.correcta {
+            background: rgba(46, 204, 113, 0.25) !important;
+            border-color: #2ecc71 !important;
+            box-shadow: 0 0 18px rgba(46, 204, 113, 0.2) !important;
+        }
+
+        .opcion.incorrecta {
+            background: rgba(231, 76, 60, 0.25) !important;
+            border-color: #e74c3c !important;
+            box-shadow: 0 0 18px rgba(231, 76, 60, 0.2) !important;
+        }
+
+        .letra-opcion {
+            background: rgba(102, 126, 234, 0.25);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1em;
+            flex-shrink: 0;
+            color: #c0c0f0;
+        }
+
+        .texto-opcion {
+            flex: 1;
+            font-size: 1.02em;
+        }
+
+        .explicacion {
+            display: none;
+            margin-top: 20px;
+            padding: 16px 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border-left: 4px solid #ffd700;
+            border-radius: 8px;
+            line-height: 1.6;
+            color: #e0d8b0;
+        }
+
+        .explicacion.visible {
+            display: block;
+            animation: fadeSlideIn 0.35s ease;
+        }
+
+        .botones {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 35px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-anterior {
+            background: rgba(255, 255, 255, 0.06);
+            color: #d0d0e0;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-anterior:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .btn-siguiente {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-siguiente:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-reiniciar {
+            background: transparent;
+            color: #ffd700;
+            border: 2px solid #ffd700;
+        }
+
+        .btn-reiniciar:hover {
+            background: rgba(255, 215, 0, 0.08);
+        }
+
+        .resultado-container {
+            display: none;
+            text-align: center;
+            padding: 25px;
+        }
+
+        .resultado-container.visible {
+            display: block;
+            animation: fadeSlideIn 0.55s ease;
+        }
+
+        .puntaje {
+            font-size: 4.5em;
+            font-weight: 700;
+            color: #ffd700;
+            margin: 25px 0;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .mensaje-final {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            line-height: 1.7;
+            color: #d0d0e0;
+        }
+
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 22px 15px;
+                border-radius: 18px;
+            }
+            h1 {
+                font-size: 1.35em;
+            }
+            .texto-pregunta {
+                font-size: 1em;
+                padding: 14px 16px;
+            }
+            button {
+                padding: 10px 16px;
+                font-size: 0.88em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Cuestionario de Estudio</h1>
+        <p class="subtitulo">Capítulos I y II · Errores en Encuestas y Planificación Estadística</p>
+        
+        <div id="zona-cuestionario">
+            <div class="progreso" id="texto-progreso">Pregunta 1 de 12</div>
+            <div class="barra-progreso">
+                <div class="barra-progreso-interna" id="barra-progreso" style="width: 8.33%;"></div>
+            </div>
+            <div id="contenedor-preguntas"></div>
+            <div class="botones" id="botones-navegacion">
+                <button class="btn-anterior" id="btn-anterior" onclick="preguntaAnterior()">◀ Anterior</button>
+                <button class="btn-reiniciar" onclick="reiniciarCuestionario()">🔄 Reiniciar</button>
+                <button class="btn-siguiente" id="btn-siguiente" onclick="preguntaSiguiente()">Siguiente ▶</button>
+            </div>
+        </div>
+        
+        <div class="resultado-container" id="resultado-container">
+            <h2 style="color: #f0f0f0;">🎉 ¡Cuestionario Completado!</h2>
+            <div class="puntaje" id="puntaje-final">0/12</div>
+            <p class="mensaje-final" id="mensaje-final"></p>
+            <button class="btn-reiniciar" onclick="reiniciarCuestionario()">🔄 Volver a Intentar</button>
+        </div>
+    </div>
+
+    <script>
+        const preguntas = [{"id": 1, "pregunta": "Según el Capítulo I, ¿cuáles son las dos fuentes principales de error en una encuesta dentro del paradigma del error total?", "opciones": {"a": "Error de cobertura y error de procesamiento", "b": "Error de muestreo y error no muestral", "c": "Error sistemático y error aleatorio", "d": "Error de respuesta y error de codificación"}, "respuesta_correcta": "b", "explicacion": "El Diagrama I.1 del capítulo identifica claramente dos fuentes: i) Error de muestreo (por no incluir a toda la población) y ii) Error no muestral (desviaciones en las respuestas)."}, {"id": 2, "pregunta": "¿Cuál de las siguientes NO es una causa de sesgo de selección mencionada en el Capítulo I?", "opciones": {"a": "Marco de muestreo incompleto o deficiente", "b": "Sustitución deliberada de unidades no disponibles", "c": "Preguntas confusas con doble negación", "d": "Ausencia de respuesta cuando los no respondientes difieren de los respondientes"}, "respuesta_correcta": "c", "explicacion": "Las preguntas confusas con doble negación son una causa de sesgo de medición, no de selección. Las otras tres opciones sí son causas de sesgo de selección según Lohr (2000)."}, {"id": 3, "pregunta": "En el proceso de respuesta del entrevistado, ¿en qué orden ocurren las etapas según el modelo cognitivo descrito en el Capítulo I?", "opciones": {"a": "Recuperación → Comprensión → Juicio → Respuesta", "b": "Juicio → Comprensión → Recuperación → Respuesta", "c": "Comprensión → Recuperación → Juicio → Respuesta", "d": "Respuesta → Juicio → Comprensión → Recuperación"}, "respuesta_correcta": "c", "explicacion": "El modelo cognitivo descrito por Groves y otros (2009) establece el orden: 1) Comprensión (interpretar la pregunta), 2) Recuperación (buscar en la memoria), 3) Juicio (combinar y resumir información) y 4) Respuesta (formular la contestación)."}, {"id": 4, "pregunta": "Según el Ciclo de Vida de una Encuesta, ¿qué nivel de inferencia se ocupa del paso desde el constructo hasta la respuesta obtenida?", "opciones": {"a": "Inferencia grupal", "b": "Inferencia individual", "c": "Inferencia poblacional", "d": "Inferencia estadística"}, "respuesta_correcta": "b", "explicacion": "El Diagrama I.2 muestra que la Inferencia Individual trata con los respondientes y comprende: Constructo → Medición → Respuesta (edición). La Inferencia Grupal va de la población objetivo a los ajustes posencuesta."}, {"id": 5, "pregunta": "¿Qué tipo de encuesta se define como una serie de encuestas transversales aplicadas en diferentes momentos con el mismo diseño metodológico, donde la selección de hogares se hace de forma independiente?", "opciones": {"a": "Encuesta de panel", "b": "Encuesta rotativa", "c": "Encuesta repetida", "d": "Encuesta transversal simple"}, "respuesta_correcta": "c", "explicacion": "Kalton y Citro (1993) definen las encuestas repetidas exactamente así: serie de encuestas transversales con selección independiente en cada aplicación, mismo diseño metodológico."}, {"id": 6, "pregunta": "¿Cuál es la principal ventaja de una encuesta de panel rotativo frente a un panel puro?", "opciones": {"a": "Es más económica siempre", "b": "Reduce el desgaste de la muestra y capta cambios en la estructura poblacional", "c": "No requiere marco de muestreo", "d": "Permite entrevistar a más personas por hogar"}, "respuesta_correcta": "b", "explicacion": "El panel rotativo reduce el efecto de desgaste del panel y, al incorporar nuevos elementos, proporciona información sobre el cambio en la composición estructural de la población."}, {"id": 7, "pregunta": "En un diseño rotativo 4(0)1, ¿cuánto traslape hay entre el primer y el quinto período de medición?", "opciones": {"a": "25%", "b": "50%", "c": "75%", "d": "0% (ningún traslape)"}, "respuesta_correcta": "d", "explicacion": "En el diseño 4(0)1, una vivienda es entrevistada durante cuatro trimestres consecutivos y luego sale del panel definitivamente. Entre el primer y quinto período no hay ningún traslape."}, {"id": 8, "pregunta": "Si necesitas estimar el cambio bruto (individual) en la situación laboral de las personas entre dos trimestres, ¿qué tipo de encuesta es APTA para esto?", "opciones": {"a": "Encuesta transversal", "b": "Encuesta repetida", "c": "Encuesta de panel (o panel rotativo)", "d": "Tanto a como b son aptas"}, "respuesta_correcta": "c", "explicacion": "Para estimar cambios brutos se necesita seguir a los mismos individuos en el tiempo. Las encuestas transversales y repetidas no permiten esto. Solo las de panel, panel rotativo o panel dividido son aptas."}, {"id": 9, "pregunta": "¿Qué parámetro poblacional se define como la suma de las observaciones de una variable de interés en la población (∑yk)?", "opciones": {"a": "Media poblacional", "b": "Proporción poblacional", "c": "Razón poblacional", "d": "Total poblacional"}, "respuesta_correcta": "d", "explicacion": "El total poblacional se define como ty = ∑yk para k∈U, es decir, la suma de la variable de interés para todos los elementos del universo."}, {"id": 10, "pregunta": "La tasa de desocupación se clasifica como un parámetro de tipo:", "opciones": {"a": "Total poblacional", "b": "Media de un dominio", "c": "Razón poblacional", "d": "Diferencia de totales"}, "respuesta_correcta": "c", "explicacion": "La tasa de desocupación es una razón entre el total de personas desocupadas (numerador) y el total de personas activas (denominador). Ambas cantidades son desconocidas de antemano."}, {"id": 11, "pregunta": "¿Qué tipo de encuesta sería la más APTA para estimar la proporción de mujeres que fueron víctimas de violencia en los últimos seis meses?", "opciones": {"a": "Solo encuesta de panel puro", "b": "Solo encuesta repetida", "c": "Todas serían aptas con ligeras modificaciones (transversal con preguntas retrospectivas, repetidas agregadas, etc.)", "d": "Solo encuesta transversal"}, "respuesta_correcta": "c", "explicacion": "Duncan y Kalton (1987) señalan que todas las encuestas resultarían aptas con modificaciones: la transversal con preguntas retrospectivas, las repetidas agregando datos, y las de panel/rotativas preguntando en cada medición."}, {"id": 12, "pregunta": "En el contexto de las encuestas de hogares, ¿qué representa la 'U' en la fórmula ty = ∑yk?", "opciones": {"a": "La muestra seleccionada", "b": "El universo o población de estudio", "c": "Las unidades primarias de muestreo", "d": "Los hogares respondientes"}, "respuesta_correcta": "b", "explicacion": "En la notación del capítulo, U hace referencia al universo de estudio, mientras que yk hace referencia a la variable de interés en el k-ésimo individuo."}];
+        let preguntaActual = 0;
+        let respuestas = new Array(preguntas.length).fill(null);
+        let cuestionarioFinalizado = false;
+
+        function inicializarCuestionario() {
+            const contenedor = document.getElementById('contenedor-preguntas');
+            contenedor.innerHTML = '';
+            
+            preguntas.forEach((p, index) => {
+                const div = document.createElement('div');
+                div.className = 'pregunta-container';
+                if (index === 0) div.classList.add('activa');
+                div.id = 'pregunta-' + index;
+                
+                let opcionesHTML = '';
+                const letras = ['a', 'b', 'c', 'd'];
+                for (let letra of letras) {
+                    opcionesHTML += `
+                        <div class="opcion" id="opcion-${index}-${letra}" onclick="seleccionarRespuesta(${index}, '${letra}')">
+                            <div class="letra-opcion">${letra.toUpperCase()}</div>
+                            <div class="texto-opcion">${p.opciones[letra]}</div>
+                        </div>
+                    `;
+                }
+                
+                div.innerHTML = `
+                    <div class="numero-pregunta">PREGUNTA ${p.id}</div>
+                    <div class="texto-pregunta">${p.pregunta}</div>
+                    <div class="opciones">
+                        ${opcionesHTML}
+                    </div>
+                    <div class="explicacion" id="explicacion-${index}">
+                        <strong>💡 Explicación:</strong> ${p.explicacion}
+                    </div>
+                `;
+                
+                contenedor.appendChild(div);
+            });
+            
+            actualizarNavegacion();
+        }
+
+        function seleccionarRespuesta(index, letra) {
+            if (cuestionarioFinalizado) return;
+            
+            // Si ya respondió esta pregunta, no permitir cambiar
+            if (respuestas[index] !== null) return;
+            
+            respuestas[index] = letra;
+            const pregunta = preguntas[index];
+            
+            // Marcar todas las opciones
+            const letras = ['a', 'b', 'c', 'd'];
+            letras.forEach(l => {
+                const opcion = document.getElementById('opcion-' + index + '-' + l);
+                if (opcion) {
+                    opcion.style.pointerEvents = 'none';
+                    if (l === pregunta.respuesta_correcta) {
+                        opcion.classList.add('correcta');
+                    }
+                }
+            });
+            
+            // Marcar la selección del usuario como correcta o incorrecta
+            const opcionUsuario = document.getElementById('opcion-' + index + '-' + letra);
+            if (opcionUsuario) {
+                opcionUsuario.classList.add('seleccionada');
+                if (letra !== pregunta.respuesta_correcta) {
+                    opcionUsuario.classList.add('incorrecta');
+                }
+            }
+            
+            // Mostrar explicación
+            const explicacion = document.getElementById('explicacion-' + index);
+            if (explicacion) {
+                explicacion.classList.add('visible');
+            }
+        }
+
+        function mostrarPregunta(index) {
+            document.querySelectorAll('.pregunta-container').forEach(p => p.classList.remove('activa'));
+            const preguntaDiv = document.getElementById('pregunta-' + index);
+            if (preguntaDiv) {
+                preguntaDiv.classList.add('activa');
+            }
+            
+            document.getElementById('texto-progreso').textContent = 'Pregunta ' + (index + 1) + ' de ' + preguntas.length;
+            document.getElementById('barra-progreso').style.width = ((index + 1) / preguntas.length * 100) + '%';
+            
+            actualizarNavegacion();
+        }
+
+        function actualizarNavegacion() {
+            document.getElementById('btn-anterior').disabled = preguntaActual === 0;
+            
+            if (preguntaActual === preguntas.length - 1) {
+                document.getElementById('btn-siguiente').textContent = '✅ Finalizar';
+            } else {
+                document.getElementById('btn-siguiente').textContent = 'Siguiente ▶';
+            }
+        }
+
+        function preguntaSiguiente() {
+            if (preguntaActual === preguntas.length - 1) {
+                finalizarCuestionario();
+                return;
+            }
+            
+            if (preguntaActual < preguntas.length - 1) {
+                preguntaActual++;
+                mostrarPregunta(preguntaActual);
+            }
+        }
+
+        function preguntaAnterior() {
+            if (preguntaActual > 0) {
+                preguntaActual--;
+                mostrarPregunta(preguntaActual);
+            }
+        }
+
+        function finalizarCuestionario() {
+            cuestionarioFinalizado = true;
+            
+            let aciertos = 0;
+            preguntas.forEach((p, index) => {
+                if (respuestas[index] === p.respuesta_correcta) {
+                    aciertos++;
+                }
+            });
+            
+            document.getElementById('zona-cuestionario').style.display = 'none';
+            document.getElementById('resultado-container').classList.add('visible');
+            document.getElementById('puntaje-final').textContent = aciertos + '/' + preguntas.length;
+            
+            const porcentaje = (aciertos / preguntas.length) * 100;
+            const mensaje = document.getElementById('mensaje-final');
+            
+            if (porcentaje >= 90) {
+                mensaje.innerHTML = '🌟 <strong>¡Excelente!</strong><br>Dominas perfectamente los conceptos de errores en encuestas y planificación estadística.';
+            } else if (porcentaje >= 70) {
+                mensaje.innerHTML = '👍 <strong>¡Buen trabajo!</strong><br>Tienes una buena comprensión, pero repasa las preguntas que fallaste.';
+            } else if (porcentaje >= 50) {
+                mensaje.innerHTML = '📚 <strong>Vas por buen camino.</strong><br>Necesitas repasar con más profundidad el material.';
+            } else {
+                mensaje.innerHTML = '📖 <strong>Es hora de estudiar más.</strong><br>Revisa con detenimiento el resumen y vuelve a intentarlo.';
+            }
+        }
+
+        function reiniciarCuestionario() {
+            preguntaActual = 0;
+            respuestas = new Array(preguntas.length).fill(null);
+            cuestionarioFinalizado = false;
+            
+            document.getElementById('zona-cuestionario').style.display = 'block';
+            document.getElementById('resultado-container').classList.remove('visible');
+            
+            inicializarCuestionario();
+            mostrarPregunta(0);
+        }
+
+        // Inicializar al cargar
+        inicializarCuestionario();
+    </script>
+</body>
+</html>
