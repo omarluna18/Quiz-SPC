@@ -1,139 +1,284 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Cuestionario (10 preguntas)</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Quiz SPC — Cuestionarios</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
-    body { font-family: system-ui, Arial, sans-serif; max-width: 900px; margin: 24px auto; padding: 0 16px; }
-    .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; margin: 14px 0; }
-    .opt { display:block; margin: 8px 0; }
-    .row { display:flex; gap:12px; flex-wrap:wrap; margin: 14px 0; }
-    button { padding: 10px 14px; border-radius: 10px; border: 1px solid #333; background: #fff; cursor: pointer; }
-    button:hover { background: #f3f3f3; }
-    .ok { color: #0a7a0a; font-weight: 700; }
-    .bad { color: #b00020; font-weight: 700; }
-    .muted { color: #666; }
+    :root {
+      --bg: #0d0f14;
+      --surface: #161a24;
+      --border: #252b3b;
+      --accent: #c8a96e;
+      --accent2: #6eb5c8;
+      --text: #e8e6e0;
+      --muted: #7a7f8e;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* background grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(200,169,110,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200,169,110,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    header {
+      position: relative;
+      z-index: 1;
+      padding: 72px 32px 40px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 900;
+      line-height: 1.05;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+
+    h1 span {
+      color: var(--accent);
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.95rem;
+      max-width: 480px;
+      line-height: 1.6;
+    }
+
+    .divider {
+      width: 64px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      margin: 32px 0;
+    }
+
+    /* grid */
+    .grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 32px 80px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 24px;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+    }
+
+    .card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 80% 20%, rgba(200,169,110,0.07), transparent 65%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+    }
+
+    .card:hover::after { opacity: 1; }
+
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--text);
+    }
+
+    .card-meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      margin-top: auto;
+    }
+
+    .card-arrow {
+      position: absolute;
+      right: 20px;
+      top: 28px;
+      color: var(--muted);
+      font-size: 1.1rem;
+      transition: color 0.25s, transform 0.25s;
+    }
+
+    .card:hover .card-arrow {
+      color: var(--accent);
+      transform: translateX(4px);
+    }
+
+    /* color accents per card */
+    .c1 .card-icon { background: rgba(200,169,110,0.12); }
+    .c2 .card-icon { background: rgba(110,181,200,0.12); }
+    .c3 .card-icon { background: rgba(180,110,200,0.12); }
+    .c4 .card-icon { background: rgba(110,200,150,0.12); }
+    .c5 .card-icon { background: rgba(200,130,110,0.12); }
+    .c6 .card-icon { background: rgba(200,200,110,0.12); }
+    .c7 .card-icon { background: rgba(150,110,200,0.12); }
+    .c8 .card-icon { background: rgba(110,200,200,0.12); }
+
+    /* stagger animation */
+    .card {
+      opacity: 0;
+      animation: fadeUp 0.5s forwards;
+    }
+    .card:nth-child(1) { animation-delay: 0.05s; }
+    .card:nth-child(2) { animation-delay: 0.10s; }
+    .card:nth-child(3) { animation-delay: 0.15s; }
+    .card:nth-child(4) { animation-delay: 0.20s; }
+    .card:nth-child(5) { animation-delay: 0.25s; }
+    .card:nth-child(6) { animation-delay: 0.30s; }
+    .card:nth-child(7) { animation-delay: 0.35s; }
+    .card:nth-child(8) { animation-delay: 0.40s; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 24px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      border-top: 1px solid var(--border);
+    }
   </style>
 </head>
 <body>
-  <h1>Cuestionario (10 preguntas)</h1>
-  <p class="muted">Las preguntas se mezclan automáticamente. Contesta y presiona <b>Calificar</b>.</p>
 
-  <div id="quiz"></div>
+<header>
+  <div class="eyebrow">Quiz SPC &mdash; Banco de cuestionarios</div>
+  <h1>Selecciona un <span>cuestionario</span></h1>
+  <p class="subtitle">Elige el tema que deseas repasar. Cada cuestionario mezcla las preguntas automáticamente.</p>
+  <div class="divider"></div>
+</header>
 
-  <div class="row">
-    <button id="grade">Calificar</button>
-    <button id="reset" type="button">Reiniciar</button>
-  </div>
+<div class="grid">
 
-  <h2 id="score"></h2>
-  <div id="review"></div>
+  <a class="card c1" href="cuestionario_demografia.html">
+    <div class="card-icon">📊</div>
+    <div class="card-title">Demografía I</div>
+    <div class="card-meta">Fuentes de datos demográficos</div>
+    <span class="card-arrow">→</span>
+  </a>
 
-<script>
-const basePreguntas = [{"pregunta": "1) ¿Cuáles son las cuatro funciones sustantivas de un servicio estadístico?", "opciones": {"A": "Generación de estadísticas básicas, generación de estadísticas derivadas, integración de estadísticas, divulgación", "B": "Planeación, presupuestación, auditoría, evaluación", "C": "Recaudación, inspección, sanción, fiscalización", "D": "Diseño gráfico, impresión, distribución, ventas"}, "respuesta": "A", "explicacion": "Las 4 funciones: estadísticas básicas, derivadas, integración y divulgación."}, {"pregunta": "2) ¿Qué describe mejor la generación de estadísticas básicas?", "opciones": {"A": "Crear indicadores usando metodologías ajenas a la fuente original", "B": "Aplicar cuestionarios o formatos a toda la población o a una muestra para cuantificar y caracterizar", "C": "Ordenar datos de distintas fuentes para facilitar consulta", "D": "Promocionar resultados en medios masivos"}, "respuesta": "B", "explicacion": "Las básicas se obtienen directamente (censos, encuestas, registros) sin conceptualizaciones ajenas al proyecto."}, {"pregunta": "3) ¿Qué incluye la generación de estadísticas básicas según el texto?", "opciones": {"A": "Censos, encuestas por muestreo y registros administrativos", "B": "Únicamente censos", "C": "Solo encuestas en línea", "D": "Solo contabilidad nacional"}, "respuesta": "A", "explicacion": "Se incluyen censos, encuestas por muestreo y registros administrativos."}, {"pregunta": "4) ¿Qué es un censo (en este contexto)?", "opciones": {"A": "Un estudio de opinión con muestra pequeña", "B": "Un registro continuo de trámites administrativos", "C": "Obtención de datos individuales de todos los elementos del conjunto de estudio en un momento/periodo específico", "D": "Una combinación de varias fuentes con metodologías externas"}, "respuesta": "C", "explicacion": "El censo cubre a todos los elementos del conjunto de estudio en un momento/periodo definido."}, {"pregunta": "5) ¿Cuáles son características clave de un censo mencionadas en el texto?", "opciones": {"A": "Aleatoriedad, confidencialidad, panel", "B": "Universalidad, exhaustividad, simultaneidad", "C": "Rentabilidad, rapidez, anonimato", "D": "Publicidad, repetición, representatividad"}, "respuesta": "B", "explicacion": "El texto resalta universalidad, exhaustividad y simultaneidad."}, {"pregunta": "6) ¿Qué describe mejor una encuesta por muestreo?", "opciones": {"A": "Selecciona una muestra representativa con procedimientos técnicos para inferir resultados a la población con cierta precisión", "B": "Mide a todos los elementos sin excepción", "C": "Solo usa registros administrativos sin ajuste alguno", "D": "Solo ordena series históricas ya publicadas"}, "respuesta": "A", "explicacion": "La encuesta por muestreo usa una muestra representativa para inferir resultados a la población."}, {"pregunta": "7) Según el texto, una limitación común de las encuestas (vs censos o registros) es que…", "opciones": {"A": "No permiten estimaciones", "B": "Tienen menor posibilidad de desglose geográfico", "C": "Siempre cuestan más que un censo", "D": "No requieren marco ni diseño muestral"}, "respuesta": "B", "explicacion": "Se menciona menor posibilidad de desglose geográfico que censos o registros."}, {"pregunta": "8) ¿Qué caracteriza el aprovechamiento de registros administrativos para fines estadísticos?", "opciones": {"A": "Se generan solo con entrevistas cara a cara", "B": "Son registros continuos de hechos/sucesos; suelen tener costo marginal y cobertura limitada al ámbito legal del registro", "C": "Siempre tienen cobertura temática ilimitada", "D": "No requieren ajustes ni integración de bases"}, "respuesta": "B", "explicacion": "Registros continuos, costo marginal y límites por el ámbito legal/administrativo; suelen requerir ajustes para uso estadístico."}, {"pregunta": "9) ¿Qué son las estadísticas derivadas?", "opciones": {"A": "Las que se obtienen aplicando cuestionarios a toda la población", "B": "Las que se producen usando estadísticas de una o varias fuentes, aplicando conceptualizaciones o metodologías ajenas a las fuentes originales", "C": "Las que solo se publican en medios masivos", "D": "Las que provienen únicamente de registros administrativos sin procesamiento"}, "respuesta": "B", "explicacion": "Derivadas = usar una o varias fuentes y aplicar conceptualizaciones/metodologías ajenas a las fuentes originales."}, {"pregunta": "10) ¿Qué describe mejor la divulgación en un servicio estadístico?", "opciones": {"A": "Actividades para hacer llegar la información a los usuarios (p. ej., comercialización, centros de consulta, atención de requerimientos, medios, redes)", "B": "Seleccionar la muestra y levantar la encuesta", "C": "Calcular indicadores complejos como contabilidad nacional", "D": "Ordenar bases de datos internas sin publicarlas"}, "respuesta": "A", "explicacion": "Divulgación = hacer llegar la información al usuario por distintos medios/mecanismos."}];
+  <a class="card c2" href="cuest_demografia_uruguay.html">
+    <div class="card-icon">🌎</div>
+    <div class="card-title">Demografía — Uruguay</div>
+    <div class="card-meta">Caso de estudio regional</div>
+    <span class="card-arrow">→</span>
+  </a>
 
-function shuffle(arr) {
-  // Fisher-Yates
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
+  <a class="card c3" href="cuestionario_80.html">
+    <div class="card-icon">📋</div>
+    <div class="card-title">Cuestionario 80</div>
+    <div class="card-meta">Serie temática</div>
+    <span class="card-arrow">→</span>
+  </a>
 
-let preguntas = [];
+  <a class="card c4" href="disenio_conceptual_y_operativo.html">
+    <div class="card-icon">🗂️</div>
+    <div class="card-title">Diseño Conceptual y Operativo</div>
+    <div class="card-meta">Metodología estadística</div>
+    <span class="card-arrow">→</span>
+  </a>
 
-function renderQuiz() {
-  const quizDiv = document.getElementById("quiz");
-  quizDiv.innerHTML = "";
+  <a class="card c5" href="proceso_gen_estadisticas_basicas.html">
+    <div class="card-icon">⚙️</div>
+    <div class="card-title">Proceso: Estadísticas Básicas</div>
+    <div class="card-meta">Generación y producción</div>
+    <span class="card-arrow">→</span>
+  </a>
 
-  // Copia profunda para no alterar el original
-  preguntas = JSON.parse(JSON.stringify(basePreguntas));
-  shuffle(preguntas);
+  <a class="card c6" href="quiz_cap19_pag584_597.html">
+    <div class="card-icon">📖</div>
+    <div class="card-title">Cap. 19 — Págs. 584–597</div>
+    <div class="card-meta">Quiz de lectura</div>
+    <span class="card-arrow">→</span>
+  </a>
 
-  preguntas.forEach((p, idx) => {
-    const card = document.createElement("div");
-    card.className = "card";
+  <a class="card c7" href="quiz_eda_cap1.html">
+    <div class="card-icon">📐</div>
+    <div class="card-title">EDA — Capítulo 1</div>
+    <div class="card-meta">Análisis exploratorio de datos</div>
+    <span class="card-arrow">→</span>
+  </a>
 
-    const h = document.createElement("h3");
-    h.textContent = p.pregunta;
-    card.appendChild(h);
+  <a class="card c8" href="quiz_planeacion.html">
+    <div class="card-icon">📅</div>
+    <div class="card-title">Planeación</div>
+    <div class="card-meta">Planificación estadística</div>
+    <span class="card-arrow">→</span>
+  </a>
 
-    const opts = p.opciones;
-    Object.keys(opts).forEach(letter => {
-      const label = document.createElement("label");
-      label.className = "opt";
-      label.innerHTML = `
-        <input type="radio" name="q${idx}" value="${letter}">
-        <b>${letter})</b> ${opts[letter]}
-      `;
-      card.appendChild(label);
-    });
+</div>
 
-    quizDiv.appendChild(card);
-  });
+<footer>Quiz SPC &mdash; omarluna18.github.io/Quiz-SPC</footer>
 
-  // limpiar resultados
-  document.getElementById("score").textContent = "";
-  document.getElementById("review").innerHTML = "";
-}
-
-function gradeQuiz() {
-  let aciertos = 0;
-  const falladas = [];
-
-  preguntas.forEach((p, idx) => {
-    const picked = document.querySelector(`input[name="q${idx}"]:checked`);
-    const resp = picked ? picked.value : null;
-
-    if (resp === p.respuesta) {
-      aciertos += 1;
-    } else {
-      falladas.push({
-        pregunta: p.pregunta,
-        tu: resp,
-        ok: p.respuesta,
-        explicacion: p.explicacion
-      });
-    }
-  });
-
-  document.getElementById("score").textContent =
-    `Resultado: ${aciertos}/${preguntas.length}  (Calificación: ${aciertos*10}/100)`;
-
-  const review = document.getElementById("review");
-  review.innerHTML = "";
-
-  if (falladas.length) {
-    const title = document.createElement("h3");
-    title.textContent = "Revisión de falladas";
-    review.appendChild(title);
-
-    falladas.forEach(f => {
-      const div = document.createElement("div");
-      div.className = "card";
-      div.innerHTML = `
-        <div><b>${f.pregunta}</b></div>
-        <div class="bad">Tu respuesta: ${f.tu ?? "Sin responder"}</div>
-        <div class="ok">Correcta: ${f.ok}</div>
-        <div class="muted">Explicación: ${f.explicacion}</div>
-      `;
-      review.appendChild(div);
-    });
-  } else {
-    const p = document.createElement("p");
-    p.className = "ok";
-    p.textContent = "¡Perfecto! No fallaste ninguna 😄";
-    review.appendChild(p);
-  }
-}
-
-document.getElementById("grade").addEventListener("click", gradeQuiz);
-document.getElementById("reset").addEventListener("click", renderQuiz);
-
-// Mezcla al cargar
-renderQuiz();
-</script>
 </body>
 </html>
