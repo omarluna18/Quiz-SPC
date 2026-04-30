@@ -11,7 +11,6 @@
       --surface: #161a24;
       --border: #252b3b;
       --accent: #c8a96e;
-      --accent2: #6eb5c8;
       --text: #e8e6e0;
       --muted: #7a7f8e;
     }
@@ -42,12 +41,11 @@
       position: relative;
       z-index: 1;
       padding: 72px 32px 40px;
-      max-width: 900px;
+      max-width: 960px;
       margin: 0 auto;
     }
 
     .eyebrow {
-      font-family: 'DM Sans', sans-serif;
       font-size: 11px;
       font-weight: 500;
       letter-spacing: 0.2em;
@@ -87,7 +85,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       gap: 16px;
-      max-width: 900px;
+      max-width: 960px;
       margin: 0 auto;
       padding: 0 32px 80px;
     }
@@ -105,6 +103,8 @@
       position: relative;
       overflow: hidden;
       transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+      opacity: 0;
+      animation: fadeUp 0.5s forwards;
     }
 
     .card::after {
@@ -165,27 +165,27 @@
       transform: translateX(4px);
     }
 
-    .c1 .card-icon { background: rgba(200,169,110,0.12); }
-    .c2 .card-icon { background: rgba(110,181,200,0.12); }
-    .c3 .card-icon { background: rgba(180,110,200,0.12); }
-    .c4 .card-icon { background: rgba(110,200,150,0.12); }
-    .c5 .card-icon { background: rgba(200,130,110,0.12); }
-    .c6 .card-icon { background: rgba(200,200,110,0.12); }
-    .c7 .card-icon { background: rgba(150,110,200,0.12); }
-    .c8 .card-icon { background: rgba(110,200,200,0.12); }
+    .c1  .card-icon { background: rgba(200,169,110,0.12); }
+    .c2  .card-icon { background: rgba(110,181,200,0.12); }
+    .c3  .card-icon { background: rgba(180,110,200,0.12); }
+    .c4  .card-icon { background: rgba(110,200,150,0.12); }
+    .c5  .card-icon { background: rgba(200,130,110,0.12); }
+    .c6  .card-icon { background: rgba(200,200,110,0.12); }
+    .c7  .card-icon { background: rgba(150,110,200,0.12); }
+    .c8  .card-icon { background: rgba(110,200,200,0.12); }
+    .c9  .card-icon { background: rgba(200,110,150,0.12); }
+    .c10 .card-icon { background: rgba(160,200,110,0.12); }
 
-    .card {
-      opacity: 0;
-      animation: fadeUp 0.5s forwards;
-    }
-    .card:nth-child(1) { animation-delay: 0.05s; }
-    .card:nth-child(2) { animation-delay: 0.10s; }
-    .card:nth-child(3) { animation-delay: 0.15s; }
-    .card:nth-child(4) { animation-delay: 0.20s; }
-    .card:nth-child(5) { animation-delay: 0.25s; }
-    .card:nth-child(6) { animation-delay: 0.30s; }
-    .card:nth-child(7) { animation-delay: 0.35s; }
-    .card:nth-child(8) { animation-delay: 0.40s; }
+    .card:nth-child(1)  { animation-delay: 0.05s; }
+    .card:nth-child(2)  { animation-delay: 0.10s; }
+    .card:nth-child(3)  { animation-delay: 0.15s; }
+    .card:nth-child(4)  { animation-delay: 0.20s; }
+    .card:nth-child(5)  { animation-delay: 0.25s; }
+    .card:nth-child(6)  { animation-delay: 0.30s; }
+    .card:nth-child(7)  { animation-delay: 0.35s; }
+    .card:nth-child(8)  { animation-delay: 0.40s; }
+    .card:nth-child(9)  { animation-delay: 0.45s; }
+    .card:nth-child(10) { animation-delay: 0.50s; }
 
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(20px); }
@@ -235,35 +235,56 @@
     <span class="card-arrow">→</span>
   </a>
 
-  <a class="card c4" href="disenio_conceptual_y_operativo.html">
+  <a class="card c4" href="cuestionario_bd.html">
+    <div class="card-icon">🗃️</div>
+    <div class="card-title">Bases de Datos</div>
+    <div class="card-meta">Fundamentos y estructuras</div>
+    <span class="card-arrow">→</span>
+  </a>
+
+  <a class="card c5" href="cuestionario_encuestas_en_hogares.html">
+    <div class="card-icon">🏠</div>
+    <div class="card-title">Encuestas en Hogares</div>
+    <div class="card-meta">Metodología y levantamiento</div>
+    <span class="card-arrow">→</span>
+  </a>
+
+  <a class="card c6" href="cuestionario_estadistica_inferencial.html">
+    <div class="card-icon">📉</div>
+    <div class="card-title">Estadística Inferencial</div>
+    <div class="card-meta">Inferencia y pruebas de hipótesis</div>
+    <span class="card-arrow">→</span>
+  </a>
+
+  <a class="card c7" href="disenio_conceptual_y_operativo.html">
     <div class="card-icon">🗂️</div>
     <div class="card-title">Diseño Conceptual y Operativo</div>
     <div class="card-meta">Metodología estadística</div>
     <span class="card-arrow">→</span>
   </a>
 
-  <a class="card c5" href="proceso_gen_estadisticas_basicas.html">
+  <a class="card c8" href="proceso_gen_estadisticas_basicas.html">
     <div class="card-icon">⚙️</div>
     <div class="card-title">Proceso: Estadísticas Básicas</div>
     <div class="card-meta">Generación y producción</div>
     <span class="card-arrow">→</span>
   </a>
 
-  <a class="card c6" href="quiz_cap19_pag584_597.html">
+  <a class="card c9" href="quiz_cap19_pag584_597.html">
     <div class="card-icon">📖</div>
     <div class="card-title">Cap. 19 — Págs. 584–597</div>
     <div class="card-meta">Quiz de lectura</div>
     <span class="card-arrow">→</span>
   </a>
 
-  <a class="card c7" href="quiz_eda_cap1.html">
+  <a class="card c10" href="quiz_eda_cap1.html">
     <div class="card-icon">📐</div>
     <div class="card-title">EDA — Capítulo 1</div>
     <div class="card-meta">Análisis exploratorio de datos</div>
     <span class="card-arrow">→</span>
   </a>
 
-  <a class="card c8" href="quiz_planeacion.html">
+  <a class="card c1" href="quiz_planeacion.html">
     <div class="card-icon">📅</div>
     <div class="card-title">Planeación</div>
     <div class="card-meta">Planificación estadística</div>
