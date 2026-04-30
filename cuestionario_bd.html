@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Fundamentos de Bases de Datos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 35px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        h1 {
+            text-align: center;
+            color: #f0f0f0;
+            margin-bottom: 8px;
+            font-size: 1.8em;
+            letter-spacing: 1px;
+        }
+
+        .subtitulo {
+            text-align: center;
+            color: #a0a0c0;
+            margin-bottom: 30px;
+            font-size: 0.95em;
+            font-weight: 300;
+        }
+
+        .progreso {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.05em;
+            color: #c0c0e0;
+            font-weight: 500;
+        }
+
+        .barra-progreso {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .barra-progreso-interna {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .pregunta-container {
+            display: none;
+            animation: fadeSlideIn 0.45s ease;
+        }
+
+        .pregunta-container.activa {
+            display: block;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .numero-pregunta {
+            color: #667eea;
+            font-weight: 700;
+            font-size: 1em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .texto-pregunta {
+            background: rgba(102, 126, 234, 0.08);
+            border-left: 5px solid #667eea;
+            padding: 18px 22px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 1.15em;
+            line-height: 1.6;
+            color: #e8e8f0;
+        }
+
+        .opciones {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .opcion {
+            background: rgba(255, 255, 255, 0.04);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 14px 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: #d0d0e0;
+        }
+
+        .opcion:hover {
+            background: rgba(102, 126, 234, 0.12);
+            border-color: rgba(102, 126, 234, 0.5);
+            transform: translateX(6px);
+        }
+
+        .opcion.seleccionada {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+            box-shadow: 0 0 18px rgba(102, 126, 234, 0.25);
+        }
+
+        .opcion.correcta {
+            background: rgba(46, 204, 113, 0.25) !important;
+            border-color: #2ecc71 !important;
+            box-shadow: 0 0 18px rgba(46, 204, 113, 0.2) !important;
+        }
+
+        .opcion.incorrecta {
+            background: rgba(231, 76, 60, 0.25) !important;
+            border-color: #e74c3c !important;
+            box-shadow: 0 0 18px rgba(231, 76, 60, 0.2) !important;
+        }
+
+        .letra-opcion {
+            background: rgba(102, 126, 234, 0.25);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1em;
+            flex-shrink: 0;
+            color: #c0c0f0;
+        }
+
+        .texto-opcion {
+            flex: 1;
+            font-size: 1.02em;
+        }
+
+        .explicacion {
+            display: none;
+            margin-top: 20px;
+            padding: 16px 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border-left: 4px solid #ffd700;
+            border-radius: 8px;
+            line-height: 1.6;
+            color: #e0d8b0;
+        }
+
+        .explicacion.visible {
+            display: block;
+            animation: fadeSlideIn 0.35s ease;
+        }
+
+        .botones {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 35px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-anterior {
+            background: rgba(255, 255, 255, 0.06);
+            color: #d0d0e0;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-anterior:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .btn-siguiente {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-siguiente:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-reiniciar {
+            background: transparent;
+            color: #ffd700;
+            border: 2px solid #ffd700;
+        }
+
+        .btn-reiniciar:hover {
+            background: rgba(255, 215, 0, 0.08);
+        }
+
+        .resultado-container {
+            display: none;
+            text-align: center;
+            padding: 25px;
+        }
+
+        .resultado-container.visible {
+            display: block;
+            animation: fadeSlideIn 0.55s ease;
+        }
+
+        .puntaje {
+            font-size: 4.5em;
+            font-weight: 700;
+            color: #ffd700;
+            margin: 25px 0;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .mensaje-final {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            line-height: 1.7;
+            color: #d0d0e0;
+        }
+
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 22px 15px;
+                border-radius: 18px;
+            }
+            h1 {
+                font-size: 1.35em;
+            }
+            .texto-pregunta {
+                font-size: 1em;
+                padding: 14px 16px;
+            }
+            button {
+                padding: 10px 16px;
+                font-size: 0.88em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Bases de Datos</h1>
+        <p class="subtitulo">Fundamentos · Arquitectura · Modelo Relacional</p>
+        
+        <div id="zona-cuestionario">
+            <div class="progreso" id="texto-progreso">Pregunta 1 de 12</div>
+            <div class="barra-progreso">
+                <div class="barra-progreso-interna" id="barra-progreso" style="width: 8.33%;"></div>
+            </div>
+            <div id="contenedor-preguntas"></div>
+            <div class="botones" id="botones-navegacion">
+                <button class="btn-anterior" id="btn-anterior" onclick="preguntaAnterior()">◀ Anterior</button>
+                <button class="btn-reiniciar" onclick="reiniciarCuestionario()">🔄 Reiniciar</button>
+                <button class="btn-siguiente" id="btn-siguiente" onclick="preguntaSiguiente()">Siguiente ▶</button>
+            </div>
+        </div>
+        
+        <div class="resultado-container" id="resultado-container">
+            <h2 style="color: #f0f0f0;">🎉 ¡Cuestionario Completado!</h2>
+            <div class="puntaje" id="puntaje-final">0/12</div>
+            <p class="mensaje-final" id="mensaje-final"></p>
+            <button class="btn-reiniciar" onclick="reiniciarCuestionario()">🔄 Volver a Intentar</button>
+        </div>
+    </div>
+
+    <script>
+        const preguntas = [{"id": 1, "pregunta": "Según el Capítulo 1, ¿cuál de los siguientes NO es un componente principal de un sistema de base de datos?", "opciones": {"a": "Datos", "b": "Hardware", "c": "El lenguaje de programación Java", "d": "Usuarios"}, "respuesta_correcta": "c", "explicacion": "Los cuatro componentes principales son: Datos, Hardware, Software (DBMS) y Usuarios. Java es un lenguaje de aplicación, no un componente estructural del sistema."}, {"id": 2, "pregunta": "¿Qué significa que los datos en una base de datos sean 'integrados'?", "opciones": {"a": "Que están en un solo archivo físico", "b": "Que pueden verse como la unificación de varios archivos, eliminando redundancias", "c": "Que pertenecen a un solo usuario", "d": "Que están encriptados por seguridad"}, "respuesta_correcta": "b", "explicacion": "Datos integrados significa que la base de datos es una unificación de varios archivos que, de otro modo, serían distintos, con una redundancia eliminada al menos parcialmente."}, {"id": 3, "pregunta": "La independencia de los datos se define como:", "opciones": {"a": "La capacidad de la base de datos para funcionar sin conexión a internet", "b": "La inmunidad de las aplicaciones a los cambios en la representación física y las técnicas de acceso", "c": "La habilidad de los usuarios para modificar los datos sin permiso", "d": "La característica de que los datos no se duplican nunca"}, "respuesta_correcta": "b", "explicacion": "La independencia de datos (especialmente la física) es la inmunidad de los programas de aplicación ante cambios en la forma en que se almacenan o acceden físicamente a los datos."}, {"id": 4, "pregunta": "En la arquitectura ANSI/SPARC de tres niveles, el nivel que está más cerca del almacenamiento físico y se ocupa de cómo se guardan los datos (con índices, registros, etc.) es el nivel:", "opciones": {"a": "Externo", "b": "Conceptual", "c": "Interno", "d": "Lógico de usuario"}, "respuesta_correcta": "c", "explicacion": "El nivel interno (o físico) es el más cercano al almacenamiento físico. Describe cómo se almacenan los datos (ej. registros almacenados, índices). El nivel conceptual es una abstracción intermedia."}, {"id": 5, "pregunta": "¿Cuál es el objetivo principal de la transformación conceptual/interna en la arquitectura ANSI/SPARC?", "opciones": {"a": "Permitir la comunicación entre diferentes DBMS", "b": "Ocultar los cambios en la estructura física de la base de datos, preservando la independencia física", "c": "Definir las vistas de cada usuario final", "d": "Gestionar las copias de seguridad de la base de datos"}, "respuesta_correcta": "b", "explicacion": "La transformación conceptual/interna define la correspondencia entre ambos niveles. Modificarla al cambiar el esquema interno aísla esos cambios, preservando la independencia física de los datos."}, {"id": 6, "pregunta": "¿Cuál de los siguientes NO es un beneficio clave de usar un sistema de base de datos en lugar de un sistema de archivos tradicional?", "opciones": {"a": "Reducción de la redundancia de datos", "b": "Mantenimiento de la integridad de los datos", "c": "Garantía de que los datos siempre serán correctos (100% libres de errores lógicos)", "d": "Control centralizado de los datos"}, "respuesta_correcta": "c", "explicacion": "Aunque las BD ayudan a mantener la integridad definiendo restricciones, no garantizan que los datos sean 100% correctos lógicamente (solo que cumplen las reglas definidas). La corrección final depende de los datos ingresados."}, {"id": 7, "pregunta": "¿Qué propiedad ACID de las transacciones asegura que una transacción se ejecute completamente o no tenga ningún efecto ('todo o nada')?", "opciones": {"a": "Consistencia", "b": "Aislamiento", "c": "Durabilidad", "d": "Atomicidad"}, "respuesta_correcta": "d", "explicacion": "La atomicidad asegura que la transacción es una unidad de trabajo indivisible: o se realizan todas sus operaciones (COMMIT) o ninguna (ROLLBACK)."}, {"id": 8, "pregunta": "En el modelo relacional, la 'propiedad de cierre' significa que:", "opciones": {"a": "Las tablas no pueden tener filas duplicadas", "b": "El resultado de una operación es otra tabla, permitiendo anidar expresiones", "c": "Los datos están físicamente cerrados en discos duros", "d": "Solo el DBA puede cerrar la base de datos"}, "respuesta_correcta": "b", "explicacion": "El cierre significa que la salida de cualquier operación relacional (restringir, proyectar, juntar) es también una tabla del mismo tipo, por lo que se pueden escribir expresiones anidadas."}, {"id": 9, "pregunta": "¿Qué comando SQL se utiliza para finalizar una transacción exitosamente y hacer permanentes todos los cambios realizados?", "opciones": {"a": "ROLLBACK", "b": "COMMIT", "c": "BEGIN TRANSACTION", "d": "SAVEPOINT"}, "respuesta_correcta": "b", "explicacion": "COMMIT finaliza la transacción con éxito y confirma (hace permanentes) todos los cambios. ROLLBACK los deshace. BEGIN TRANSACTION inicia una."}, {"id": 10, "pregunta": "Una clave foránea (o externa) se define como:", "opciones": {"a": "La columna que identifica de forma única una fila dentro de su propia tabla", "b": "Un índice que acelera las consultas de búsqueda", "c": "Una columna (o conjunto de columnas) en una tabla cuyos valores deben coincidir con los de una clave candidata en otra tabla", "d": "Un tipo de dato especial para almacenar valores nulos"}, "respuesta_correcta": "c", "explicacion": "Una clave foránea (o externa) es un conjunto de atributos en una tabla 'referente' que referencia la clave candidata (generalmente la primaria) de otra tabla 'referida'. Implementa la integridad referencial."}, {"id": 11, "pregunta": "¿Qué beneficio proporcionan las VISTAS en un sistema de base de datos relacional?", "opciones": {"a": "Aceleran todas las operaciones de inserción y actualización", "b": "Son la única forma de definir claves primarias", "c": "Proporcionan seguridad al ocultar datos y permiten la independencia lógica de los datos", "d": "Reemplazan completamente a las tablas base"}, "respuesta_correcta": "c", "explicacion": "Las vistas ofrecen seguridad (ocultan datos sensibles) y son el medio para lograr la independencia lógica de los datos (inmunidad a cambios en la estructura lógica)."}, {"id": 12, "pregunta": "Según el resumen, la diferencia entre un DBMS y una 'base de datos' es que:", "opciones": {"a": "Son exactamente el mismo concepto", "b": "El DBMS es el software que administra los datos, mientras que la base de datos es el contenedor físico de esos datos", "c": "La base de datos es el hardware y el DBMS el software", "d": "El DBMS solo se usa en sistemas grandes, la base de datos en personales"}, "respuesta_correcta": "b", "explicacion": "El DBMS (Sistema de Administración de Base de Datos) es el software que gestiona el acceso y la organización. La base de datos es el conjunto de datos persistentes almacenados. Es un error común llamar 'base de datos' al DBMS."}];
+        let preguntaActual = 0;
+        let respuestas = new Array(preguntas.length).fill(null);
+        let cuestionarioFinalizado = false;
+
+        function inicializarCuestionario() {
+            const contenedor = document.getElementById('contenedor-preguntas');
+            contenedor.innerHTML = '';
+            
+            preguntas.forEach((p, index) => {
+                const div = document.createElement('div');
+                div.className = 'pregunta-container';
+                if (index === 0) div.classList.add('activa');
+                div.id = 'pregunta-' + index;
+                
+                let opcionesHTML = '';
+                const letras = ['a', 'b', 'c', 'd'];
+                for (let letra of letras) {
+                    opcionesHTML += `
+                        <div class="opcion" id="opcion-${index}-${letra}" onclick="seleccionarRespuesta(${index}, '${letra}')">
+                            <div class="letra-opcion">${letra.toUpperCase()}</div>
+                            <div class="texto-opcion">${p.opciones[letra]}</div>
+                        </div>
+                    `;
+                }
+                
+                div.innerHTML = `
+                    <div class="numero-pregunta">PREGUNTA ${p.id}</div>
+                    <div class="texto-pregunta">${p.pregunta}</div>
+                    <div class="opciones">
+                        ${opcionesHTML}
+                    </div>
+                    <div class="explicacion" id="explicacion-${index}">
+                        <strong>💡 Explicación:</strong> ${p.explicacion}
+                    </div>
+                `;
+                
+                contenedor.appendChild(div);
+            });
+            
+            actualizarNavegacion();
+        }
+
+        function seleccionarRespuesta(index, letra) {
+            if (cuestionarioFinalizado) return;
+            if (respuestas[index] !== null) return;
+            
+            respuestas[index] = letra;
+            const pregunta = preguntas[index];
+            
+            const letras = ['a', 'b', 'c', 'd'];
+            letras.forEach(l => {
+                const opcion = document.getElementById('opcion-' + index + '-' + l);
+                if (opcion) {
+                    opcion.style.pointerEvents = 'none';
+                    if (l === pregunta.respuesta_correcta) {
+                        opcion.classList.add('correcta');
+                    }
+                }
+            });
+            
+            const opcionUsuario = document.getElementById('opcion-' + index + '-' + letra);
+            if (opcionUsuario) {
+                opcionUsuario.classList.add('seleccionada');
+                if (letra !== pregunta.respuesta_correcta) {
+                    opcionUsuario.classList.add('incorrecta');
+                }
+            }
+            
+            const explicacion = document.getElementById('explicacion-' + index);
+            if (explicacion) {
+                explicacion.classList.add('visible');
+            }
+        }
+
+        function mostrarPregunta(index) {
+            document.querySelectorAll('.pregunta-container').forEach(p => p.classList.remove('activa'));
+            const preguntaDiv = document.getElementById('pregunta-' + index);
+            if (preguntaDiv) {
+                preguntaDiv.classList.add('activa');
+            }
+            
+            document.getElementById('texto-progreso').textContent = 'Pregunta ' + (index + 1) + ' de ' + preguntas.length;
+            document.getElementById('barra-progreso').style.width = ((index + 1) / preguntas.length * 100) + '%';
+            
+            actualizarNavegacion();
+        }
+
+        function actualizarNavegacion() {
+            document.getElementById('btn-anterior').disabled = preguntaActual === 0;
+            
+            if (preguntaActual === preguntas.length - 1) {
+                document.getElementById('btn-siguiente').textContent = '✅ Finalizar';
+            } else {
+                document.getElementById('btn-siguiente').textContent = 'Siguiente ▶';
+            }
+        }
+
+        function preguntaSiguiente() {
+            if (preguntaActual === preguntas.length - 1) {
+                finalizarCuestionario();
+                return;
+            }
+            
+            if (preguntaActual < preguntas.length - 1) {
+                preguntaActual++;
+                mostrarPregunta(preguntaActual);
+            }
+        }
+
+        function preguntaAnterior() {
+            if (preguntaActual > 0) {
+                preguntaActual--;
+                mostrarPregunta(preguntaActual);
+            }
+        }
+
+        function finalizarCuestionario() {
+            cuestionarioFinalizado = true;
+            
+            let aciertos = 0;
+            preguntas.forEach((p, index) => {
+                if (respuestas[index] === p.respuesta_correcta) {
+                    aciertos++;
+                }
+            });
+            
+            document.getElementById('zona-cuestionario').style.display = 'none';
+            document.getElementById('resultado-container').classList.add('visible');
+            document.getElementById('puntaje-final').textContent = aciertos + '/' + preguntas.length;
+            
+            const porcentaje = (aciertos / preguntas.length) * 100;
+            const mensaje = document.getElementById('mensaje-final');
+            
+            if (porcentaje >= 90) {
+                mensaje.innerHTML = '🌟 <strong>¡Excelente!</strong><br>Dominas perfectamente los fundamentos de bases de datos.';
+            } else if (porcentaje >= 70) {
+                mensaje.innerHTML = '👍 <strong>¡Buen trabajo!</strong><br>Tienes una buena comprensión, pero repasa las preguntas que fallaste.';
+            } else if (porcentaje >= 50) {
+                mensaje.innerHTML = '📚 <strong>Vas por buen camino.</strong><br>Necesitas repasar con más profundidad el resumen.';
+            } else {
+                mensaje.innerHTML = '📖 <strong>Es hora de estudiar más.</strong><br>Revisa con detenimiento el material y vuelve a intentarlo.';
+            }
+        }
+
+        function reiniciarCuestionario() {
+            preguntaActual = 0;
+            respuestas = new Array(preguntas.length).fill(null);
+            cuestionarioFinalizado = false;
+            
+            document.getElementById('zona-cuestionario').style.display = 'block';
+            document.getElementById('resultado-container').classList.remove('visible');
+            
+            inicializarCuestionario();
+            mostrarPregunta(0);
+        }
+
+        inicializarCuestionario();
+    </script>
+</body>
+</html>
