@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Metodología de Investigación Cuantitativa (Briones)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 850px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 35px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        h1 {
+            text-align: center;
+            color: #f0f0f0;
+            margin-bottom: 8px;
+            font-size: 1.6em;
+            letter-spacing: 1px;
+        }
+
+        .subtitulo {
+            text-align: center;
+            color: #a0a0c0;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+            font-weight: 300;
+        }
+
+        .progreso {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.05em;
+            color: #c0c0e0;
+            font-weight: 500;
+        }
+
+        .barra-progreso {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .barra-progreso-interna {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .pregunta-container {
+            display: none;
+            animation: fadeSlideIn 0.45s ease;
+        }
+
+        .pregunta-container.activa {
+            display: block;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .numero-pregunta {
+            color: #667eea;
+            font-weight: 700;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .texto-pregunta {
+            background: rgba(102, 126, 234, 0.08);
+            border-left: 5px solid #667eea;
+            padding: 18px 22px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #e8e8f0;
+        }
+
+        .opciones {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .opcion {
+            background: rgba(255, 255, 255, 0.04);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 14px 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: #d0d0e0;
+        }
+
+        .opcion:hover {
+            background: rgba(102, 126, 234, 0.12);
+            border-color: rgba(102, 126, 234, 0.5);
+            transform: translateX(6px);
+        }
+
+        .opcion.seleccionada {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+            box-shadow: 0 0 18px rgba(102, 126, 234, 0.25);
+        }
+
+        .opcion.correcta {
+            background: rgba(46, 204, 113, 0.25) !important;
+            border-color: #2ecc71 !important;
+            box-shadow: 0 0 18px rgba(46, 204, 113, 0.2) !important;
+        }
+
+        .opcion.incorrecta {
+            background: rgba(231, 76, 60, 0.25) !important;
+            border-color: #e74c3c !important;
+            box-shadow: 0 0 18px rgba(231, 76, 60, 0.2) !important;
+        }
+
+        .letra-opcion {
+            background: rgba(102, 126, 234, 0.25);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1em;
+            flex-shrink: 0;
+            color: #c0c0f0;
+        }
+
+        .texto-opcion {
+            flex: 1;
+            font-size: 1.02em;
+        }
+
+        .explicacion {
+            display: none;
+            margin-top: 20px;
+            padding: 16px 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border-left: 4px solid #ffd700;
+            border-radius: 8px;
+            line-height: 1.6;
+            color: #e0d8b0;
+            font-size: 0.95em;
+        }
+
+        .explicacion.visible {
+            display: block;
+            animation: fadeSlideIn 0.35s ease;
+        }
+
+        .botones {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 35px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-anterior {
+            background: rgba(255, 255, 255, 0.06);
+            color: #d0d0e0;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-anterior:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .btn-siguiente {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-siguiente:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-reiniciar {
+            background: transparent;
+            color: #ffd700;
+            border: 2px solid #ffd700;
+        }
+
+        .btn-reiniciar:hover {
+            background: rgba(255, 215, 0, 0.08);
+        }
+
+        .resultado-container {
+            display: none;
+            text-align: center;
+            padding: 25px;
+        }
+
+        .resultado-container.visible {
+            display: block;
+            animation: fadeSlideIn 0.55s ease;
+        }
+
+        .puntaje {
+            font-size: 4.5em;
+            font-weight: 700;
+            color: #ffd700;
+            margin: 25px 0;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .mensaje-final {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            line-height: 1.7;
+            color: #d0d0e0;
+        }
+
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 22px 15px;
+                border-radius: 18px;
+            }
+            h1 {
+                font-size: 1.35em;
+            }
+            .texto-pregunta {
+                font-size: 1em;
+                padding: 14px 16px;
+            }
+            button {
+                padding: 10px 16px;
+                font-size: 0.88em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Cuestionario de Estudio</h1>
+        <p class="subtitulo">Metodología de Investigación Cuantitativa · Guillermo Briones</p>
+        <p class="subtitulo" style="margin-top: -15px;">Constructos · Variables · Análisis Descriptivo e Inferencial · Regresión Múltiple</p>
+
+        <div id="zona-cuestionario">
+            <div class="progreso" id="texto-progreso">Pregunta 1 de 12</div>
+            <div class="barra-progreso">
+                <div class="barra-progreso-interna" id="barra-progreso" style="width: 8.33%;"></div>
+            </div>
+            <div id="contenedor-preguntas"></div>
+            <div class="botones" id="botones-navegacion">
+                <button class="btn-anterior" id="btn-anterior" onclick="preguntaAnterior()">◀ Anterior</button>
+                <button class="btn-reiniciar" onclick="reiniciarCuestionario()">🔄 Reiniciar</button>
+                <button class="btn-siguiente" id="btn-siguiente" onclick="preguntaSiguiente()">Siguiente ▶</button>
+            </div>
+        </div>
+
+        <div class="resultado-container" id="resultado-container">
+            <h2 style="color: #f0f0f0;">🎉 ¡Cuestionario Completado!</h2>
+            <div class="puntaje" id="puntaje-final">0/12</div>
+            <p class="mensaje-final" id="mensaje-final"></p>
+            <button class="btn-reiniciar" onclick="reiniciarCuestionario()">🔄 Volver a Intentar</button>
+        </div>
+    </div>
+
+    <script>
+        const preguntas = [
+            {
+                "id": 1,
+                "pregunta": "Según Briones, ¿qué diferencia fundamental existe entre un constructo y una variable?",
+                "opciones": {
+                    "a": "Los constructos son observables directamente, las variables son hipotéticas",
+                    "b": "El constructo es un concepto teórico no observable, mientras que la variable es una característica que se da en grados o modalidades diferentes",
+                    "c": "Las variables son siempre cuantitativas y los constructos siempre cualitativos",
+                    "d": "No existe diferencia, son términos intercambiables"
+                },
+                "respuesta_correcta": "b",
+                "explicacion": "Un constructo es una propiedad teórica e hipotética (como inteligencia o motivación). Una variable es una propiedad que se da en grados o modalidades diferentes en las personas (como edad o ingreso)."
+            },
+            {
+                "id": 2,
+                "pregunta": "¿Cuál es el criterio MÁS importante para elegir la técnica de análisis estadístico adecuada?",
+                "opciones": {
+                    "a": "El tamaño de la muestra",
+                    "b": "El nivel de medición de las variables (nominal, ordinal, proporcional)",
+                    "c": "El costo del software estadístico",
+                    "d": "La cantidad de páginas del informe final"
+                },
+                "respuesta_correcta": "b",
+                "explicacion": "La clasificación de variables según su nivel de medición (nominal, ordinal, proporcional) tiene especial importancia para elegir las técnicas apropiadas de análisis. Por ejemplo, para dos variables ordinales se usa gamma, no correlación de Pearson."
+            },
+            {
+                "id": 3,
+                "pregunta": "Un investigador mide el nivel de autoestima con una escala Likert de 5 puntos. ¿Qué nivel de medición tiene esta variable?",
+                "opciones": {
+                    "a": "Nominal",
+                    "b": "Ordinal",
+                    "c": "Proporcional",
+                    "d": "De razón"
+                },
+                "respuesta_correcta": "b",
+                "explicacion": "Las actitudes medidas con escalas Likert son variables ordinales: los números solo indican mayor o menor grado (ej. 5 significa más autoestima que 3), pero no se puede decir que una persona con 5 tenga el doble que una con 2.5."
+            },
+            {
+                "id": 4,
+                "pregunta": "¿Qué función cumple la asignación aleatoria (al azar) en un diseño experimental clásico?",
+                "opciones": {
+                    "a": "Aumentar el tamaño de la muestra sin costo adicional",
+                    "b": "Igualar las características de los sujetos en los grupos experimental y de control",
+                    "c": "Eliminar la necesidad de hacer mediciones post-test",
+                    "d": "Convertir el diseño en cuasiexperimental"
+                },
+                "respuesta_correcta": "b",
+                "explicacion": "La asignación aleatoria a grupos experimental y de control busca lograr una igualación lo más cercana posible de las características de los sujetos, para descartar variables distintas a la variable independiente cuyo efecto se desea establecer."
+            },
+            {
+                "id": 5,
+                "pregunta": "En un análisis de regresión simple, ¿qué indica el coeficiente de determinación (r²)?",
+                "opciones": {
+                    "a": "La dirección de la relación (positiva o negativa)",
+                    "b": "El porcentaje de variación de la variable dependiente explicada por la variable independiente",
+                    "c": "La probabilidad de que la relación sea estadísticamente significativa",
+                    "d": "El valor de la pendiente de la recta de regresión"
+                },
+                "respuesta_correcta": "b",
+                "explicacion": "El cuadrado del coeficiente 'r' (coeficiente de determinación) indica la variación de Y que es explicada por la variación de X. Por ejemplo, si r² = 0.31, el 31% de la variación de la variable dependiente es explicada por la variable independiente."
+            },
+            {
+                "id": 6,
+                "pregunta": "¿Cuál es la hipótesis nula (H₀) en una prueba de significación estadística?",
+                "opciones": {
+                    "a": "La relación observada en la muestra también existe en la población",
+                    "b": "No existe diferencia real en la población entre los grupos o variables comparadas",
+                    "c": "El investigador acepta su hipótesis de investigación",
+                    "d": "El error de muestreo siempre es cero"
+                },
+                "respuesta_correcta": "b",
+                "explicacion": "La hipótesis nula (H₀) plantea que en la población no existe diferencia entre los valores de los subgrupos (proporciones, medias, etc.). Lo que se busca es rechazar esta hipótesis con un nivel de significación dado."
+            },
+            {
+                "id": 7,
+                "pregunta": "Se quiere comparar los promedios de ingresos de tres grupos ocupacionales diferentes. ¿Qué técnica estadística es la apropiada?",
+                "opciones": {
+                    "a": "Prueba t para muestras independientes",
+                    "b": "Chi cuadrado",
+                    "c": "Análisis de varianza simple (ANOVA)",
+                    "d": "Coeficiente de correlación de Pearson"
+                },
+                "respuesta_correcta": "c",
+                "explicacion": "El análisis simple de la varianza (ANOVA) permite comparar dos, tres o más medias aritméticas de submuestras definidas por categorías de una variable independiente. La prueba t solo sirve para dos grupos."
+            },
+            {
+                "id": 8,
+                "pregunta": "En la ecuación de regresión múltiple Y = 0.29 + 0.06X₁ + 0.09X₂, donde Y es rendimiento escolar, X₁ es calidad del maestro y X₂ es ambiente escolar, ¿qué interpretación es correcta?",
+                "opciones": {
+                    "a": "La calidad del maestro (X₁) tiene un efecto mayor que el ambiente (X₂)",
+                    "b": "El ambiente escolar (X₂) tiene un efecto mayor que la calidad del maestro (X₁)",
+                    "c": "Ambas variables tienen el mismo efecto sobre el rendimiento",
+                    "d": "El intercepto indica que sin X₁ ni X₂ el rendimiento es negativo"
+                },
+                "respuesta_correcta": "b",
+                "explicacion": "Los coeficientes b indican el efecto parcial. X₂ tiene b=0.09 y X₁ tiene b=0.06. Por lo tanto, una variación de un punto en X₂ aumenta el rendimiento en 0.09 puntos, mientras que la misma variación en X₁ solo aumenta 0.06 puntos. El efecto del ambiente es mayor."
+            },
+            {
+                "id": 9,
+                "pregunta": "¿Qué diferencia al análisis de senderos (path analysis) de la regresión múltiple estándar?",
+                "opciones": {
+                    "a": "El análisis de senderos no usa ecuaciones matemáticas",
+                    "b": "El análisis de senderos permite probar modelos causales con relaciones asimétricas y unidireccionales (recursivos)",
+                    "c": "El análisis de senderos solo funciona con dos variables",
+                    "d": "El análisis de senderos no requiere supuestos estadísticos"
+                },
+                "respuesta_correcta": "b",
+                "explicacion": "El análisis de senderos es una aplicación de la regresión múltiple que permite probar modelos causales basados en teoría, con relaciones unidireccionales (recursivas). Se representa con diagramas de flechas que indican la dirección de la influencia causal."
+            },
+            {
+                "id": 10,
+                "pregunta": "¿Qué propiedad tienen las variables proporcionales (o de razón) que NO tienen las ordinales?",
+                "opciones": {
+                    "a": "Pueden usarse para clasificar personas en categorías",
+                    "b": "Permiten establecer relaciones de 'mayor que' o 'menor que'",
+                    "c": "Tienen un cero real y permiten hacer proporciones (ej. 'el doble de')",
+                    "d": "Solo pueden tomar valores enteros"
+                },
+                "respuesta_correcta": "c",
+                "explicacion": "Las variables proporcionales tienen un valor cero real y permiten relaciones de proporcionalidad. Si una persona gana $10,000 y otra $5,000, la primera gana el doble que la segunda. Esto no es posible con variables ordinales."
+            },
+            {
+                "id": 11,
+                "pregunta": "En una investigación cuantitativa, ¿qué es un 'indicador'?",
+                "opciones": {
+                    "a": "Un tipo de variable independiente",
+                    "b": "Una manifestación externa, empírica y observable de un constructo o variable subyacente",
+                    "c": "El marco muestral de la investigación",
+                    "d": "El informe final de resultados"
+                },
+                "respuesta_correcta": "b",
+                "explicacion": "Los indicadores son manifestaciones externas y observables de constructos teóricos. Por ejemplo, las respuestas a preguntas específicas pueden ser indicadores de una actitud subyacente, o el ingreso puede ser un indicador de la posición social."
+            },
+            {
+                "id": 12,
+                "pregunta": "Si se obtiene un valor de chi cuadrado de 15.1 con 1 grado de libertad y se compara con el valor crítico de 3.841 (α=0.05), ¿qué decisión se toma?",
+                "opciones": {
+                    "a": "Se acepta la hipótesis nula (no hay asociación)",
+                    "b": "Se rechaza la hipótesis nula (hay asociación estadísticamente significativa)",
+                    "c": "Se repite el experimento por falta de datos",
+                    "d": "No se puede concluir nada"
+                },
+                "respuesta_correcta": "b",
+                "explicacion": "El valor calculado (15.1) es mayor que el valor crítico de la tabla (3.841). Por lo tanto, se rechaza la hipótesis nula y se acepta la hipótesis alternativa: existe asociación estadísticamente significativa en la población."
+            }
+        ];
+
+        let preguntaActual = 0;
+        let respuestas = new Array(preguntas.length).fill(null);
+        let cuestionarioFinalizado = false;
+
+        function inicializarCuestionario() {
+            const contenedor = document.getElementById('contenedor-preguntas');
+            contenedor.innerHTML = '';
+
+            preguntas.forEach((p, index) => {
+                const div = document.createElement('div');
+                div.className = 'pregunta-container';
+                if (index === 0) div.classList.add('activa');
+                div.id = 'pregunta-' + index;
+
+                let opcionesHTML = '';
+                const letras = ['a', 'b', 'c', 'd'];
+                for (let letra of letras) {
+                    opcionesHTML += `
+                        <div class="opcion" id="opcion-${index}-${letra}" onclick="seleccionarRespuesta(${index}, '${letra}')">
+                            <div class="letra-opcion">${letra.toUpperCase()}</div>
+                            <div class="texto-opcion">${p.opciones[letra]}</div>
+                        </div>
+                    `;
+                }
+
+                div.innerHTML = `
+                    <div class="numero-pregunta">PREGUNTA ${p.id}</div>
+                    <div class="texto-pregunta">${p.pregunta}</div>
+                    <div class="opciones">
+                        ${opcionesHTML}
+                    </div>
+                    <div class="explicacion" id="explicacion-${index}">
+                        <strong>💡 Explicación:</strong> ${p.explicacion}
+                    </div>
+                `;
+
+                contenedor.appendChild(div);
+            });
+
+            actualizarNavegacion();
+        }
+
+        function seleccionarRespuesta(index, letra) {
+            if (cuestionarioFinalizado) return;
+            if (respuestas[index] !== null) return;
+
+            respuestas[index] = letra;
+            const pregunta = preguntas[index];
+
+            const letras = ['a', 'b', 'c', 'd'];
+            letras.forEach(l => {
+                const opcion = document.getElementById('opcion-' + index + '-' + l);
+                if (opcion) {
+                    opcion.style.pointerEvents = 'none';
+                    if (l === pregunta.respuesta_correcta) {
+                        opcion.classList.add('correcta');
+                    }
+                }
+            });
+
+            const opcionUsuario = document.getElementById('opcion-' + index + '-' + letra);
+            if (opcionUsuario) {
+                opcionUsuario.classList.add('seleccionada');
+                if (letra !== pregunta.respuesta_correcta) {
+                    opcionUsuario.classList.add('incorrecta');
+                }
+            }
+
+            const explicacion = document.getElementById('explicacion-' + index);
+            if (explicacion) {
+                explicacion.classList.add('visible');
+            }
+        }
+
+        function mostrarPregunta(index) {
+            document.querySelectorAll('.pregunta-container').forEach(p => p.classList.remove('activa'));
+            const preguntaDiv = document.getElementById('pregunta-' + index);
+            if (preguntaDiv) {
+                preguntaDiv.classList.add('activa');
+            }
+
+            document.getElementById('texto-progreso').textContent = 'Pregunta ' + (index + 1) + ' de ' + preguntas.length;
+            document.getElementById('barra-progreso').style.width = ((index + 1) / preguntas.length * 100) + '%';
+
+            actualizarNavegacion();
+        }
+
+        function actualizarNavegacion() {
+            document.getElementById('btn-anterior').disabled = preguntaActual === 0;
+
+            if (preguntaActual === preguntas.length - 1) {
+                document.getElementById('btn-siguiente').textContent = '✅ Finalizar';
+            } else {
+                document.getElementById('btn-siguiente').textContent = 'Siguiente ▶';
+            }
+        }
+
+        function preguntaSiguiente() {
+            if (preguntaActual === preguntas.length - 1) {
+                finalizarCuestionario();
+                return;
+            }
+
+            if (preguntaActual < preguntas.length - 1) {
+                preguntaActual++;
+                mostrarPregunta(preguntaActual);
+            }
+        }
+
+        function preguntaAnterior() {
+            if (preguntaActual > 0) {
+                preguntaActual--;
+                mostrarPregunta(preguntaActual);
+            }
+        }
+
+        function finalizarCuestionario() {
+            cuestionarioFinalizado = true;
+
+            let aciertos = 0;
+            preguntas.forEach((p, index) => {
+                if (respuestas[index] === p.respuesta_correcta) {
+                    aciertos++;
+                }
+            });
+
+            document.getElementById('zona-cuestionario').style.display = 'none';
+            document.getElementById('resultado-container').classList.add('visible');
+            document.getElementById('puntaje-final').textContent = aciertos + '/' + preguntas.length;
+
+            const porcentaje = (aciertos / preguntas.length) * 100;
+            const mensaje = document.getElementById('mensaje-final');
+
+            if (porcentaje >= 90) {
+                mensaje.innerHTML = '🌟 <strong>¡Excelente!</strong><br>Dominas perfectamente los conceptos de metodología cuantitativa. ¡Listo para el examen!';
+            } else if (porcentaje >= 70) {
+                mensaje.innerHTML = '👍 <strong>¡Buen trabajo!</strong><br>Tienes una buena comprensión. Revisa las preguntas que fallaste para consolidar.';
+            } else if (porcentaje >= 50) {
+                mensaje.innerHTML = '📚 <strong>Vas por buen camino.</strong><br>Te recomiendo repasar el resumen sobre niveles de medición y pruebas de significación.';
+            } else {
+                mensaje.innerHTML = '📖 <strong>Es hora de estudiar más.</strong><br>Revisa con detenimiento las páginas 29-33, 73-97 y 145-149 del texto original.';
+            }
+        }
+
+        function reiniciarCuestionario() {
+            preguntaActual = 0;
+            respuestas = new Array(preguntas.length).fill(null);
+            cuestionarioFinalizado = false;
+
+            document.getElementById('zona-cuestionario').style.display = 'block';
+            document.getElementById('resultado-container').classList.remove('visible');
+
+            inicializarCuestionario();
+            mostrarPregunta(0);
+        }
+
+        // Inicializar al cargar
+        inicializarCuestionario();
+    </script>
+</body>
+</html>
