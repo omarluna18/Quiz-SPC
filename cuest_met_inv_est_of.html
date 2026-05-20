@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Métodos de Investigación en Estadísticas Oficiales</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 35px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        h1 {
+            text-align: center;
+            color: #f0f0f0;
+            margin-bottom: 8px;
+            font-size: 1.6em;
+            letter-spacing: 1px;
+        }
+
+        .subtitulo {
+            text-align: center;
+            color: #a0a0c0;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+            font-weight: 300;
+        }
+
+        .progreso {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.05em;
+            color: #c0c0e0;
+            font-weight: 500;
+        }
+
+        .barra-progreso {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .barra-progreso-interna {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .pregunta-container {
+            display: none;
+            animation: fadeSlideIn 0.45s ease;
+        }
+
+        .pregunta-container.activa {
+            display: block;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .numero-pregunta {
+            color: #667eea;
+            font-weight: 700;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .texto-pregunta {
+            background: rgba(102, 126, 234, 0.08);
+            border-left: 5px solid #667eea;
+            padding: 18px 22px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #e8e8f0;
+        }
+
+        .opciones {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .opcion {
+            background: rgba(255, 255, 255, 0.04);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 14px 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: #d0d0e0;
+        }
+
+        .opcion:hover {
+            background: rgba(102, 126, 234, 0.12);
+            border-color: rgba(102, 126, 234, 0.5);
+            transform: translateX(6px);
+        }
+
+        .opcion.seleccionada {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+            box-shadow: 0 0 18px rgba(102, 126, 234, 0.25);
+        }
+
+        .opcion.correcta {
+            background: rgba(46, 204, 113, 0.25) !important;
+            border-color: #2ecc71 !important;
+            box-shadow: 0 0 18px rgba(46, 204, 113, 0.2) !important;
+        }
+
+        .opcion.incorrecta {
+            background: rgba(231, 76, 60, 0.25) !important;
+            border-color: #e74c3c !important;
+            box-shadow: 0 0 18px rgba(231, 76, 60, 0.2) !important;
+        }
+
+        .letra-opcion {
+            background: rgba(102, 126, 234, 0.25);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1em;
+            flex-shrink: 0;
+            color: #c0c0f0;
+        }
+
+        .texto-opcion {
+            flex: 1;
+            font-size: 0.98em;
+        }
+
+        .explicacion {
+            display: none;
+            margin-top: 20px;
+            padding: 16px 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border-left: 4px solid #ffd700;
+            border-radius: 8px;
+            line-height: 1.6;
+            color: #e0d8b0;
+            font-size: 0.9em;
+        }
+
+        .explicacion.visible {
+            display: block;
+            animation: fadeSlideIn 0.35s ease;
+        }
+
+        .botones {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 35px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-anterior {
+            background: rgba(255, 255, 255, 0.06);
+            color: #d0d0e0;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-anterior:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .btn-siguiente {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-siguiente:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-reiniciar {
+            background: transparent;
+            color: #ffd700;
+            border: 2px solid #ffd700;
+        }
+
+        .btn-reiniciar:hover {
+            background: rgba(255, 215, 0, 0.08);
+        }
+
+        .resultado-container {
+            display: none;
+            text-align: center;
+            padding: 25px;
+        }
+
+        .resultado-container.visible {
+            display: block;
+            animation: fadeSlideIn 0.55s ease;
+        }
+
+        .puntaje {
+            font-size: 4.5em;
+            font-weight: 700;
+            color: #ffd700;
+            margin: 25px 0;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .mensaje-final {
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            line-height: 1.7;
+            color: #d0d0e0;
+        }
+
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 22px 15px;
+                border-radius: 18px;
+            }
+            h1 {
+                font-size: 1.3em;
+            }
+            .texto-pregunta {
+                font-size: 1em;
+                padding: 14px 16px;
+            }
+            button {
+                padding: 10px 16px;
+                font-size: 0.88em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Cuestionario de Estudio</h1>
+        <p class="subtitulo">Basado en el resumen: páginas 34-42 (Formulación del plan) y páginas 147-170 (Redacción y presentación)</p>
+
+        <div id="zona-cuestionario">
+            <div class="progreso" id="texto-progreso">Pregunta 1 de 12</div>
+            <div class="barra-progreso">
+                <div class="barra-progreso-interna" id="barra-progreso" style="width: 8.33%;"></div>
+            </div>
+            <div id="contenedor-preguntas"></div>
+            <div class="botones" id="botones-navegacion">
+                <button class="btn-anterior" id="btn-anterior" onclick="preguntaAnterior()">◀ Anterior</button>
+                <button class="btn-reiniciar" onclick="reiniciarCuestionario()">🔄 Reiniciar</button>
+                <button class="btn-siguiente" id="btn-siguiente" onclick="preguntaSiguiente()">Siguiente ▶</button>
+            </div>
+        </div>
+
+        <div class="resultado-container" id="resultado-container">
+            <h2 style="color: #f0f0f0;">🎉 ¡Cuestionario Completado!</h2>
+            <div class="puntaje" id="puntaje-final">0/12</div>
+            <p class="mensaje-final" id="mensaje-final"></p>
+            <button class="btn-reiniciar" onclick="reiniciarCuestionario()">🔄 Volver a Intentar</button>
+        </div>
+    </div>
+
+    <script>
+        const preguntas = [
+            {
+                "id": 1,
+                "pregunta": "Según el resumen (págs. 34-35), ¿cuál es la principal diferencia entre una hipótesis de investigación y un supuesto?",
+                "opciones": {
+                    "a": "La hipótesis es una respuesta tentativa que se puede probar, mientras que el supuesto es una condición que se da por sentada y no se prueba.",
+                    "b": "La hipótesis siempre es verdadera, mientras que el supuesto es falso.",
+                    "c": "El supuesto es una respuesta tentativa y la hipótesis es una condición que se da por sentada.",
+                    "d": "No hay diferencia, ambos son lo mismo."
+                },
+                "respuesta_correcta": "a",
+                "explicacion": "La hipótesis es una respuesta tentativa que se prueba en la investigación. El supuesto es una condición que se da por sentada (por conveniencia o limitaciones) y no se puede probar en ese estudio."
+            },
+            {
+                "id": 2,
+                "pregunta": "¿Cuál de las siguientes NO es una característica que debe cumplir una buena hipótesis de investigación?",
+                "opciones": {
+                    "a": "Debe ser compleja y difícil de entender.",
+                    "b": "Debe ser clara y específica.",
+                    "c": "Debe ser comprobable usando datos y métodos existentes.",
+                    "d": "Debe estar libre de sesgos del investigador."
+                },
+                "respuesta_correcta": "a",
+                "explicacion": "Una buena hipótesis debe ser clara, específica, comprobable, basada en literatura previa, simple y libre de sesgos. La complejidad innecesaria no es una cualidad deseable."
+            },
+            {
+                "id": 3,
+                "pregunta": "En la formulación del plan de investigación, ¿qué pregunta fundamental debe responder el investigador según la página 37?",
+                "opciones": {
+                    "a": "¿Cuánto dinero costará la investigación?",
+                    "b": "¿Cómo voy a medir lo que quiero estudiar?",
+                    "c": "¿Qué título tendrá mi informe final?",
+                    "d": "¿Quién será mi supervisor de tesis?"
+                },
+                "respuesta_correcta": "b",
+                "explicacion": "La sección 2.4 (pág. 37) indica que la pregunta fundamental es '¿Cómo voy a medir lo que quiero estudiar?', lo que lleva a definir los marcos conceptual y operativo."
+            },
+            {
+                "id": 4,
+                "pregunta": "¿Cuál es la función principal del Marco Conceptual (Teórico) en una investigación?",
+                "opciones": {
+                    "a": "Recolectar datos numéricos en el campo.",
+                    "b": "Transformar conceptos abstractos en indicadores medibles.",
+                    "c": "Revelar elementos implícitos del sistema y explicar fenómenos usando definiciones conceptuales.",
+                    "d": "Realizar el análisis estadístico de los datos."
+                },
+                "respuesta_correcta": "c",
+                "explicacion": "El Marco Conceptual define los conceptos clave usando otros conceptos y su función es revelar elementos implícitos y explicar fenómenos. La transformación en indicadores medibles es función del Marco Operativo."
+            },
+            {
+                "id": 5,
+                "pregunta": "Según el resumen, ¿qué es la 'definición operativa' de un concepto?",
+                "opciones": {
+                    "a": "La definición del concepto usando un diccionario común.",
+                    "b": "La especificación del procedimiento para medir un concepto, a menudo incluyendo números y una unidad de análisis.",
+                    "c": "Una opinión personal del investigador sobre el concepto.",
+                    "d": "La explicación teórica del concepto basada en leyes universales."
+                },
+                "respuesta_correcta": "b",
+                "explicacion": "La definición operativa especifica el procedimiento para medir un concepto, conectando la teoría con la realidad empírica. A menudo incluye números y una unidad de análisis (hogar, individuo, etc.)."
+            },
+            {
+                "id": 6,
+                "pregunta": "Ordena los siguientes niveles de medición del de MENOR a MAYOR precisión, según el manual:",
+                "opciones": {
+                    "a": "Razón → Intervalo → Ordinal → Nominal",
+                    "b": "Nominal → Ordinal → Intervalo → Razón",
+                    "c": "Ordinal → Nominal → Razón → Intervalo",
+                    "d": "Intervalo → Razón → Nominal → Ordinal"
+                },
+                "respuesta_correcta": "b",
+                "explicacion": "El orden correcto de menor a mayor precisión es: Nominal (categorías sin orden), Ordinal (categorías con orden), Intervalo (distancias iguales, cero arbitrario) y Razón (cero absoluto, permite proporciones)."
+            },
+            {
+                "id": 7,
+                "pregunta": "La temperatura en grados Celsius es un ejemplo de variable de nivel:",
+                "opciones": {
+                    "a": "Nominal",
+                    "b": "Ordinal",
+                    "c": "Intervalo",
+                    "d": "Razón"
+                },
+                "respuesta_correcta": "c",
+                "explicacion": "La temperatura en °C tiene distancias iguales entre valores, pero su cero es arbitrario (0°C no significa 'ausencia de temperatura'), por lo tanto es una variable de intervalo."
+            },
+            {
+                "id": 8,
+                "pregunta": "¿Cuál es la diferencia clave entre la estrategia DEDUCTIVA y la INDUCTIVA en el uso de modelos?",
+                "opciones": {
+                    "a": "La deductiva usa modelos matemáticos, la inductiva usa modelos conceptuales.",
+                    "b": "La deductiva va de la investigación a la teoría, la inductiva va de la teoría a la investigación.",
+                    "c": "La deductiva va de la teoría a la investigación (prueba proposiciones), la inductiva va de la investigación a la teoría (construye teoría desde patrones).",
+                    "d": "No hay diferencia, son sinónimos."
+                },
+                "respuesta_correcta": "c",
+                "explicacion": "La estrategia deductiva: teoría → investigación (se prueba una proposición derivada de la teoría). La inductiva: investigación → teoría (se analizan patrones y luego se construye una teoría)."
+            },
+            {
+                "id": 9,
+                "pregunta": "Según la página 44, ¿qué tres elementos debe incluir el informe final sobre cada método de análisis seleccionado?",
+                "opciones": {
+                    "a": "Nombre, costo del software, y opinión del investigador.",
+                    "b": "Nombre y descripción, justificación de su elección, y supuestos para aplicarlo.",
+                    "c": "Resultados, tabla de datos, y gráficos.",
+                    "d": "Bibliografía, agradecimientos y anexos."
+                },
+                "respuesta_correcta": "b",
+                "explicacion": "El informe debe incluir: 1) nombre y descripción del método, 2) justificación de por qué fue elegido, y 3) sus supuestos y cómo se cumplen en la investigación."
+            },
+            {
+                "id": 10,
+                "pregunta": "En la redacción del informe, ¿cuál es la estructura recomendada para la INTRODUCCIÓN?",
+                "opciones": {
+                    "a": "Resultados → Discusión → Conclusión.",
+                    "b": "Contexto (panorama general) → Problema/Necesidad (brecha de conocimiento) → Respuesta/Solución (objetivo del estudio).",
+                    "c": "Resumen ejecutivo → Metodología → Conclusiones.",
+                    "d": "Agradecimientos → Hipótesis → Resultados."
+                },
+                "respuesta_correcta": "b",
+                "explicacion": "La estructura recomendada para la introducción es: 1) Contexto (panorama general), 2) Problema/Necesidad (qué no se sabe y por qué es importante), 3) Respuesta/Solución (objetivo del estudio)."
+            },
+            {
+                "id": 11,
+                "pregunta": "Según las recomendaciones para diapositivas de PowerPoint, ¿cuál es una práctica INCORRECTA?",
+                "opciones": {
+                    "a": "Usar un máximo de 4-5 líneas por diapositiva.",
+                    "b": "Leer en voz alta todo el texto de la diapositiva palabra por palabra.",
+                    "c": "Usar frases cortas con viñetas (bullets).",
+                    "d": "Asegurarse de que la fuente sea legible desde 2 metros de distancia."
+                },
+                "respuesta_correcta": "b",
+                "explicacion": "Leer directamente la diapositiva es incorrecto porque la audiencia puede leer. El presentador debe expandir los puntos, mantener contacto visual y no limitarse a leer. Las otras opciones son prácticas correctas."
+            },
+            {
+                "id": 12,
+                "pregunta": "¿Qué debes hacer si durante tu presentación oral un miembro del público hace una pregunta TÉCNICA muy desafiante que no sabes responder?",
+                "opciones": {
+                    "a": "Ignorar la pregunta y continuar con la siguiente diapositiva.",
+                    "b": "Decir honestamente que no sabes la respuesta (sin disculparte) y ofrecer hablar después o investigarlo.",
+                    "c": "Invertir el rol y preguntarle al público qué piensa.",
+                    "d": "Dar una respuesta inventada para no quedar mal."
+                },
+                "respuesta_correcta": "b",
+                "explicacion": "Lo recomendado es ser honesto: decir que no sabes la respuesta (sin necesidad de disculparte excesivamente) y ofrecer investigarlo o tener una conversación después. La honestidad es valorada."
+            }
+        ];
+
+        let preguntaActual = 0;
+        let respuestas = new Array(preguntas.length).fill(null);
+        let cuestionarioFinalizado = false;
+
+        function inicializarCuestionario() {
+            const contenedor = document.getElementById('contenedor-preguntas');
+            contenedor.innerHTML = '';
+
+            preguntas.forEach((p, index) => {
+                const div = document.createElement('div');
+                div.className = 'pregunta-container';
+                if (index === 0) div.classList.add('activa');
+                div.id = 'pregunta-' + index;
+
+                let opcionesHTML = '';
+                const letras = ['a', 'b', 'c', 'd'];
+                for (let letra of letras) {
+                    opcionesHTML += `
+                        <div class="opcion" id="opcion-${index}-${letra}" onclick="seleccionarRespuesta(${index}, '${letra}')">
+                            <div class="letra-opcion">${letra.toUpperCase()}</div>
+                            <div class="texto-opcion">${p.opciones[letra]}</div>
+                        </div>
+                    `;
+                }
+
+                div.innerHTML = `
+                    <div class="numero-pregunta">PREGUNTA ${p.id}</div>
+                    <div class="texto-pregunta">${p.pregunta}</div>
+                    <div class="opciones">
+                        ${opcionesHTML}
+                    </div>
+                    <div class="explicacion" id="explicacion-${index}">
+                        <strong>💡 Explicación:</strong> ${p.explicacion}
+                    </div>
+                `;
+
+                contenedor.appendChild(div);
+            });
+
+            actualizarNavegacion();
+        }
+
+        function seleccionarRespuesta(index, letra) {
+            if (cuestionarioFinalizado) return;
+
+            if (respuestas[index] !== null) return;
+
+            respuestas[index] = letra;
+            const pregunta = preguntas[index];
+
+            const letras = ['a', 'b', 'c', 'd'];
+            letras.forEach(l => {
+                const opcion = document.getElementById('opcion-' + index + '-' + l);
+                if (opcion) {
+                    opcion.style.pointerEvents = 'none';
+                    if (l === pregunta.respuesta_correcta) {
+                        opcion.classList.add('correcta');
+                    }
+                }
+            });
+
+            const opcionUsuario = document.getElementById('opcion-' + index + '-' + letra);
+            if (opcionUsuario) {
+                opcionUsuario.classList.add('seleccionada');
+                if (letra !== pregunta.respuesta_correcta) {
+                    opcionUsuario.classList.add('incorrecta');
+                }
+            }
+
+            const explicacion = document.getElementById('explicacion-' + index);
+            if (explicacion) {
+                explicacion.classList.add('visible');
+            }
+        }
+
+        function mostrarPregunta(index) {
+            document.querySelectorAll('.pregunta-container').forEach(p => p.classList.remove('activa'));
+            const preguntaDiv = document.getElementById('pregunta-' + index);
+            if (preguntaDiv) {
+                preguntaDiv.classList.add('activa');
+            }
+
+            document.getElementById('texto-progreso').textContent = 'Pregunta ' + (index + 1) + ' de ' + preguntas.length;
+            document.getElementById('barra-progreso').style.width = ((index + 1) / preguntas.length * 100) + '%';
+
+            actualizarNavegacion();
+        }
+
+        function actualizarNavegacion() {
+            document.getElementById('btn-anterior').disabled = preguntaActual === 0;
+
+            if (preguntaActual === preguntas.length - 1) {
+                document.getElementById('btn-siguiente').textContent = '✅ Finalizar';
+            } else {
+                document.getElementById('btn-siguiente').textContent = 'Siguiente ▶';
+            }
+        }
+
+        function preguntaSiguiente() {
+            if (preguntaActual === preguntas.length - 1) {
+                finalizarCuestionario();
+                return;
+            }
+
+            if (preguntaActual < preguntas.length - 1) {
+                preguntaActual++;
+                mostrarPregunta(preguntaActual);
+            }
+        }
+
+        function preguntaAnterior() {
+            if (preguntaActual > 0) {
+                preguntaActual--;
+                mostrarPregunta(preguntaActual);
+            }
+        }
+
+        function finalizarCuestionario() {
+            cuestionarioFinalizado = true;
+
+            let aciertos = 0;
+            preguntas.forEach((p, index) => {
+                if (respuestas[index] === p.respuesta_correcta) {
+                    aciertos++;
+                }
+            });
+
+            document.getElementById('zona-cuestionario').style.display = 'none';
+            document.getElementById('resultado-container').classList.add('visible');
+            document.getElementById('puntaje-final').textContent = aciertos + '/' + preguntas.length;
+
+            const porcentaje = (aciertos / preguntas.length) * 100;
+            const mensaje = document.getElementById('mensaje-final');
+
+            if (porcentaje >= 90) {
+                mensaje.innerHTML = '🌟 <strong>¡Excelente!</strong><br>Dominas perfectamente los conceptos de planificación, redacción y presentación.';
+            } else if (porcentaje >= 70) {
+                mensaje.innerHTML = '👍 <strong>¡Buen trabajo!</strong><br>Tienes una buena comprensión, pero repasa las preguntas que fallaste.';
+            } else if (porcentaje >= 50) {
+                mensaje.innerHTML = '📚 <strong>Vas por buen camino.</strong><br>Necesitas repasar con más profundidad el resumen.';
+            } else {
+                mensaje.innerHTML = '📖 <strong>Es hora de estudiar más.</strong><br>Revisa con detenimiento el resumen y vuelve a intentarlo.';
+            }
+        }
+
+        function reiniciarCuestionario() {
+            preguntaActual = 0;
+            respuestas = new Array(preguntas.length).fill(null);
+            cuestionarioFinalizado = false;
+
+            document.getElementById('zona-cuestionario').style.display = 'block';
+            document.getElementById('resultado-container').classList.remove('visible');
+
+            inicializarCuestionario();
+            mostrarPregunta(0);
+        }
+
+        inicializarCuestionario();
+    </script>
+</body>
+</html>
