@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario - Capítulos 3, 5 y 6 (Planteamiento, Alcance e Hipótesis)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb4d);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 850px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            padding: 35px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 8px;
+            font-size: 1.9em;
+            letter-spacing: 0px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .subtitulo {
+            text-align: center;
+            color: #f0d0a0;
+            margin-bottom: 30px;
+            font-size: 1em;
+            font-weight: 400;
+        }
+
+        .progreso {
+            text-align: center;
+            margin-bottom: 12px;
+            font-size: 1.05em;
+            color: #e0e0e0;
+            font-weight: 500;
+        }
+
+        .barra-progreso {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .barra-progreso-interna {
+            height: 100%;
+            background: linear-gradient(90deg, #fdbb4d, #b21f1f);
+            border-radius: 4px;
+            transition: width 0.4s ease;
+        }
+
+        .pregunta-container {
+            display: none;
+            animation: fadeSlideIn 0.4s ease;
+        }
+
+        .pregunta-container.activa {
+            display: block;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .numero-pregunta {
+            color: #fdbb4d;
+            font-weight: 700;
+            font-size: 1em;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .texto-pregunta {
+            background: rgba(0, 0, 0, 0.35);
+            border-left: 5px solid #fdbb4d;
+            padding: 18px 24px;
+            border-radius: 14px;
+            margin-bottom: 28px;
+            font-size: 1.18em;
+            line-height: 1.55;
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .opciones {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .opcion {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            padding: 14px 20px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: #f5f0e8;
+        }
+
+        .opcion:hover {
+            background: rgba(253, 187, 77, 0.15);
+            border-color: rgba(253, 187, 77, 0.7);
+            transform: translateX(5px);
+        }
+
+        .opcion.seleccionada {
+            background: rgba(253, 187, 77, 0.25);
+            border-color: #fdbb4d;
+        }
+
+        .opcion.correcta {
+            background: rgba(46, 204, 113, 0.3) !important;
+            border-color: #2ecc71 !important;
+        }
+
+        .opcion.incorrecta {
+            background: rgba(231, 76, 60, 0.35) !important;
+            border-color: #e74c3c !important;
+        }
+
+        .letra-opcion {
+            background: rgba(0, 0, 0, 0.4);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.1em;
+            flex-shrink: 0;
+            color: #fdbb4d;
+        }
+
+        .texto-opcion {
+            flex: 1;
+            font-size: 1.02em;
+        }
+
+        .explicacion {
+            display: none;
+            margin-top: 22px;
+            padding: 16px 22px;
+            background: rgba(0, 0, 0, 0.45);
+            border-left: 4px solid #2ecc71;
+            border-radius: 12px;
+            line-height: 1.55;
+            color: #d4e0e8;
+            font-size: 0.95em;
+        }
+
+        .explicacion.visible {
+            display: block;
+            animation: fadeSlideIn 0.35s ease;
+        }
+
+        .botones {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 35px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 40px;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-anterior {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .btn-anterior:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-3px);
+        }
+
+        .btn-siguiente {
+            background: linear-gradient(135deg, #fdbb4d, #b21f1f);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .btn-siguiente:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(178, 31, 31, 0.4);
+        }
+
+        .btn-reiniciar {
+            background: transparent;
+            color: #fdbb4d;
+            border: 2px solid #fdbb4d;
+        }
+
+        .btn-reiniciar:hover {
+            background: rgba(253, 187, 77, 0.12);
+            transform: scale(1.02);
+        }
+
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            pointer-events: none;
+        }
+
+        .resultado-container {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .resultado-container.visible {
+            display: block;
+            animation: fadeSlideIn 0.5s ease;
+        }
+
+        .puntaje {
+            font-size: 5em;
+            font-weight: 800;
+            color: #fdbb4d;
+            margin: 25px 0;
+            text-shadow: 3px 3px 12px rgba(0,0,0,0.5);
+        }
+
+        .mensaje-final {
+            font-size: 1.2em;
+            margin-bottom: 35px;
+            line-height: 1.65;
+            color: #f0e6d0;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 22px 18px;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+            .texto-pregunta {
+                font-size: 1em;
+                padding: 15px 18px;
+            }
+            button {
+                padding: 10px 18px;
+                font-size: 0.85em;
+            }
+            .letra-opcion {
+                width: 32px;
+                height: 32px;
+                font-size: 0.95em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📘 Cuestionario de Metodología</h1>
+        <p class="subtitulo">Capítulos 3 (Planteamiento), 5 (Alcance) y 6 (Hipótesis)</p>
+
+        <div id="zona-cuestionario">
+            <div class="progreso" id="texto-progreso">Pregunta 1 de 10</div>
+            <div class="barra-progreso">
+                <div class="barra-progreso-interna" id="barra-progreso" style="width: 10%;"></div>
+            </div>
+            <div id="contenedor-preguntas"></div>
+            <div class="botones" id="botones-navegacion">
+                <button class="btn-anterior" id="btn-anterior">◀ Anterior</button>
+                <button class="btn-reiniciar" id="btn-reiniciar">🔄 Reiniciar</button>
+                <button class="btn-siguiente" id="btn-siguiente">Siguiente ▶</button>
+            </div>
+        </div>
+
+        <div class="resultado-container" id="resultado-container">
+            <h2 style="color: #ffffff;">✨ ¡Cuestionario Completado! ✨</h2>
+            <div class="puntaje" id="puntaje-final">0/10</div>
+            <p class="mensaje-final" id="mensaje-final"></p>
+            <button class="btn-reiniciar" id="btn-reiniciar-final">🔄 Volver a Intentar</button>
+        </div>
+    </div>
+
+    <script>
+        const preguntas = [
+            {
+                "id": 1,
+                "pregunta": "Según el Capítulo 3, ¿cuál de los siguientes NO es un elemento fundamental del planteamiento del problema?",
+                "opciones": {
+                    "a": "Objetivos de investigación",
+                    "b": "Justificación de la investigación",
+                    "c": "Formulación de hipótesis estadísticas",
+                    "d": "Preguntas de investigación"
+                },
+                "respuesta_correcta": "c",
+                "explicacion": "La formulación de hipótesis es un paso posterior (Capítulo 6). Los tres elementos fundamentales del planteamiento son: objetivos, preguntas y justificación."
+            },
+            {
+                "id": 2,
+                "pregunta": "En el enfoque cualitativo, el planteamiento del problema de investigación...",
+                "opciones": {
+                    "a": "Siempre debe hacerse al inicio, con términos precisos y concretos.",
+                    "b": "Debe evitarse por completo para no contaminar los datos.",
+                    "c": "Puede surgir en cualquier momento del proceso, incluso al inicio o al final.",
+                    "d": "No es necesario, ya que la investigación cualitativa no requiere un problema definido."
+                },
+                "respuesta_correcta": "c",
+                "explicacion": "A diferencia del enfoque cuantitativo, en el cualitativo el planteamiento del problema es más flexible y puede surgir durante la inmersión en el campo, al recolectar datos o al analizarlos."
+            },
+            {
+                "id": 3,
+                "pregunta": "Una pregunta de investigación como '¿Por qué algunos matrimonios duran más que otros?' es considerada inadecuada porque...",
+                "opciones": {
+                    "a": "No es relevante socialmente.",
+                    "b": "Utiliza términos ambiguos y es demasiado general para conducir a una investigación concreta.",
+                    "c": "Ya ha sido respondida por investigaciones previas.",
+                    "d": "Plantea una relación causal imposible de probar."
+                },
+                "respuesta_correcta": "b",
+                "explicacion": "El capítulo señala que preguntas demasiado generales no conducen a una investigación concreta. Deben refinar y precisar, usando términos no ambiguos, para guiar el estudio."
+            },
+            {
+                "id": 4,
+                "pregunta": "¿Cuál de los siguientes NO es un criterio para evaluar el valor potencial de una investigación, según el Capítulo 3?",
+                "opciones": {
+                    "a": "Implicaciones prácticas",
+                    "b": "Valor teórico",
+                    "c": "Originalidad del título",
+                    "d": "Relevancia social"
+                },
+                "respuesta_correcta": "c",
+                "explicacion": "Los criterios mencionados son: conveniencia, relevancia social, implicaciones prácticas, valor teórico y utilidad metodológica. La originalidad del título no es un criterio para evaluar el valor de una investigación."
+            },
+            {
+                "id": 5,
+                "pregunta": "Un estudio que busca especificar las propiedades y características importantes de un fenómeno, como un censo nacional de población, se clasifica como de alcance...",
+                "opciones": {
+                    "a": "Exploratorio",
+                    "b": "Descriptivo",
+                    "c": "Correlacional",
+                    "d": "Explicativo"
+                },
+                "respuesta_correcta": "b",
+                "explicacion": "El estudio descriptivo busca especificar propiedades y características de fenómenos. Un censo describe la población en un momento dado, sin analizar relaciones entre variables."
+            },
+            {
+                "id": 6,
+                "pregunta": "¿Cuál es la principal diferencia entre un estudio correlacional y uno explicativo?",
+                "opciones": {
+                    "a": "El correlacional se usa con variables cualitativas y el explicativo con cuantitativas.",
+                    "b": "El correlacional mide la relación entre variables, mientras que el explicativo busca las causas de esa relación.",
+                    "c": "El correlacional se realiza en laboratorio y el explicativo en campo.",
+                    "d": "No hay diferencia, son términos sinónimos en metodología."
+                },
+                "respuesta_correcta": "b",
+                "explicacion": "Los estudios correlacionales evalúan la relación entre variables, mientras que los explicativos van más allá y se dirigen a responder a las causas de los eventos, buscando el 'por qué'."
+            },
+            {
+                "id": 7,
+                "pregunta": "Un investigador quiere analizar si el consumo de alcohol está relacionado con la violencia intrafamiliar, sin manipular ninguna variable. El alcance de su estudio es principalmente...",
+                "opciones": {
+                    "a": "Exploratorio",
+                    "b": "Descriptivo",
+                    "c": "Correlacional",
+                    "d": "Explicativo"
+                },
+                "respuesta_correcta": "c",
+                "explicacion": "El estudio busca evaluar la relación (correlación) entre dos variables (consumo de alcohol y violencia intrafamiliar) sin manipularlas, tal como se dan en su contexto natural."
+            },
+            {
+                "id": 8,
+                "pregunta": "Las hipótesis en el enfoque cuantitativo-deductivo se definen como...",
+                "opciones": {
+                    "a": "Los resultados finales que se esperan encontrar en la investigación.",
+                    "b": "Explicaciones tentativas del fenómeno, formuladas como proposiciones a probar.",
+                    "c": "Preguntas que el investigador se plantea al inicio del estudio.",
+                    "d": "Afirmaciones verdaderas que no necesitan ser comprobadas."
+                },
+                "respuesta_correcta": "b",
+                "explicacion": "La hipótesis es una explicación tentativa, no un hecho. Se formula como proposición para ser sometida a prueba empírica y verificar si se apoya o no."
+            },
+            {
+                "id": 9,
+                "pregunta": "Para que una hipótesis sea científicamente útil en un estudio cuantitativo, debe cumplir con varios requisitos. ¿Cuál de los siguientes es uno de ellos?",
+                "opciones": {
+                    "a": "Debe referirse a aspectos morales o juicios de valor.",
+                    "b": "Los términos (variables) deben ser vagos para permitir múltiples interpretaciones.",
+                    "c": "La relación entre las variables debe ser clara, lógica y observable en la realidad.",
+                    "d": "Debe ser imposible de medir para mantener su cualidad mística."
+                },
+                "respuesta_correcta": "c",
+                "explicacion": "Una buena hipótesis requiere que la relación entre variables sea clara, lógica y que sus términos sean observables y medibles en la realidad (referentes empíricos)."
+            },
+            {
+                "id": 10,
+                "pregunta": "La transformación de una hipótesis de investigación ('Hi') en símbolos estadísticos para poder ser analizada se conoce como...",
+                "opciones": {
+                    "a": "Hipótesis nula (Ho)",
+                    "b": "Hipótesis alternativa (Ha)",
+                    "c": "Definición operacional de las variables",
+                    "d": "Hipótesis estadística"
+                },
+                "respuesta_correcta": "d",
+                "explicacion": "Las hipótesis estadísticas representan la transformación de las hipótesis de investigación, nulas y alternativas en símbolos estadísticos para su posterior análisis con datos cuantitativos."
+            }
+        ];
+
+        let preguntaActual = 0;
+        let respuestas = new Array(preguntas.length).fill(null);
+        let cuestionarioFinalizado = false;
+
+        function inicializarCuestionario() {
+            const contenedor = document.getElementById('contenedor-preguntas');
+            contenedor.innerHTML = '';
+
+            preguntas.forEach((p, idx) => {
+                const div = document.createElement('div');
+                div.className = 'pregunta-container';
+                if (idx === 0) div.classList.add('activa');
+                div.id = 'pregunta-' + idx;
+
+                let opcionesHTML = '';
+                const letras = ['a', 'b', 'c', 'd'];
+                for (let letra of letras) {
+                    opcionesHTML += `
+                        <div class="opcion" id="opcion-${idx}-${letra}" data-letra="${letra}">
+                            <div class="letra-opcion">${letra.toUpperCase()}</div>
+                            <div class="texto-opcion">${p.opciones[letra]}</div>
+                        </div>
+                    `;
+                }
+
+                div.innerHTML = `
+                    <div class="numero-pregunta">🔍 PREGUNTA ${p.id}</div>
+                    <div class="texto-pregunta">${p.pregunta}</div>
+                    <div class="opciones">
+                        ${opcionesHTML}
+                    </div>
+                    <div class="explicacion" id="explicacion-${idx}">
+                        <strong>📖 Explicación:</strong> ${p.explicacion}
+                    </div>
+                `;
+
+                contenedor.appendChild(div);
+            });
+
+            // Vincular eventos después de crear los elementos
+            for (let idx = 0; idx < preguntas.length; idx++) {
+                const letras = ['a', 'b', 'c', 'd'];
+                for (let letra of letras) {
+                    const opcion = document.getElementById(`opcion-${idx}-${letra}`);
+                    if (opcion) {
+                        opcion.addEventListener('click', () => seleccionarRespuesta(idx, letra));
+                    }
+                }
+            }
+
+            actualizarNavegacion();
+        }
+
+        function seleccionarRespuesta(index, letra) {
+            if (cuestionarioFinalizado) return;
+            if (respuestas[index] !== null) return;
+
+            respuestas[index] = letra;
+            const pregunta = preguntas[index];
+
+            const letras = ['a', 'b', 'c', 'd'];
+            letras.forEach(l => {
+                const opcion = document.getElementById(`opcion-${index}-${l}`);
+                if (opcion) {
+                    opcion.style.pointerEvents = 'none';
+                    if (l === pregunta.respuesta_correcta) {
+                        opcion.classList.add('correcta');
+                    }
+                }
+            });
+
+            const opcionUsuario = document.getElementById(`opcion-${index}-${letra}`);
+            if (opcionUsuario) {
+                opcionUsuario.classList.add('seleccionada');
+                if (letra !== pregunta.respuesta_correcta) {
+                    opcionUsuario.classList.add('incorrecta');
+                }
+            }
+
+            const explicacion = document.getElementById(`explicacion-${index}`);
+            if (explicacion) {
+                explicacion.classList.add('visible');
+            }
+        }
+
+        function mostrarPregunta(index) {
+            document.querySelectorAll('.pregunta-container').forEach(p => p.classList.remove('activa'));
+            const preguntaDiv = document.getElementById('pregunta-' + index);
+            if (preguntaDiv) preguntaDiv.classList.add('activa');
+
+            document.getElementById('texto-progreso').textContent = `Pregunta ${index + 1} de ${preguntas.length}`;
+            const porcentaje = ((index + 1) / preguntas.length) * 100;
+            document.getElementById('barra-progreso').style.width = porcentaje + '%';
+
+            actualizarNavegacion();
+        }
+
+        function actualizarNavegacion() {
+            const btnAnterior = document.getElementById('btn-anterior');
+            const btnSiguiente = document.getElementById('btn-siguiente');
+            if (btnAnterior) btnAnterior.disabled = preguntaActual === 0;
+
+            if (preguntaActual === preguntas.length - 1) {
+                if (btnSiguiente) btnSiguiente.textContent = '✅ Finalizar';
+            } else {
+                if (btnSiguiente) btnSiguiente.textContent = 'Siguiente ▶';
+            }
+        }
+
+        function preguntaSiguiente() {
+            if (preguntaActual === preguntas.length - 1) {
+                finalizarCuestionario();
+                return;
+            }
+            if (preguntaActual < preguntas.length - 1) {
+                preguntaActual++;
+                mostrarPregunta(preguntaActual);
+            }
+        }
+
+        function preguntaAnterior() {
+            if (preguntaActual > 0) {
+                preguntaActual--;
+                mostrarPregunta(preguntaActual);
+            }
+        }
+
+        function finalizarCuestionario() {
+            cuestionarioFinalizado = true;
+            let aciertos = 0;
+            preguntas.forEach((p, idx) => {
+                if (respuestas[idx] === p.respuesta_correcta) aciertos++;
+            });
+
+            document.getElementById('zona-cuestionario').style.display = 'none';
+            const resultadoContainer = document.getElementById('resultado-container');
+            resultadoContainer.classList.add('visible');
+            document.getElementById('puntaje-final').textContent = `${aciertos}/${preguntas.length}`;
+
+            const porcentaje = (aciertos / preguntas.length) * 100;
+            const mensaje = document.getElementById('mensaje-final');
+
+            if (porcentaje >= 90) {
+                mensaje.innerHTML = '🏆 <strong>¡Excelente!</strong><br>Dominas los conceptos de planteamiento, alcance e hipótesis. ¡Listo para el examen!';
+            } else if (porcentaje >= 70) {
+                mensaje.innerHTML = '👍 <strong>¡Muy bien!</strong><br>Tienes buena comprensión. Revisa las explicaciones de las que fallaste.';
+            } else if (porcentaje >= 50) {
+                mensaje.innerHTML = '📚 <strong>Vas bien.</strong><br>Te sugiero repasar el resumen y los detalles clave de cada capítulo.';
+            } else {
+                mensaje.innerHTML = '📖 <strong>Necesitas estudiar más.</strong><br>Revisa con calma el material y vuelve a intentarlo.';
+            }
+        }
+
+        function reiniciarCuestionario() {
+            preguntaActual = 0;
+            respuestas = new Array(preguntas.length).fill(null);
+            cuestionarioFinalizado = false;
+
+            document.getElementById('zona-cuestionario').style.display = 'block';
+            document.getElementById('resultado-container').classList.remove('visible');
+
+            inicializarCuestionario();
+            mostrarPregunta(0);
+        }
+
+        // Eventos después de inicializar el DOM
+        document.addEventListener('DOMContentLoaded', () => {
+            inicializarCuestionario();
+            document.getElementById('btn-anterior').addEventListener('click', preguntaAnterior);
+            document.getElementById('btn-siguiente').addEventListener('click', preguntaSiguiente);
+            document.getElementById('btn-reiniciar').addEventListener('click', reiniciarCuestionario);
+            const btnReiniciarFinal = document.getElementById('btn-reiniciar-final');
+            if (btnReiniciarFinal) btnReiniciarFinal.addEventListener('click', reiniciarCuestionario);
+        });
+    </script>
+</body>
+</html>
